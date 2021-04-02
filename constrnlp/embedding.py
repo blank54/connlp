@@ -2,18 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # Configuration
-import os
-import re
-
 from gensim.models import Word2Vec, Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-abspath = os.path.dirname(os.path.abspath(__file__))
-config_path = os.path.sep.join(abspath.split(os.path.sep)[:-1])
-from config import Config
-with open(os.path.join(config_path, 'custom.cfg'), 'r') as f:
-    cfg = Config(f)
 
 
 class Vectorizer:

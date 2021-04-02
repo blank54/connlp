@@ -2,19 +2,11 @@
 # -*- coding: utf-8 -*-
 
 # Configuration
-import os
-import re
 import itertools
 from collections import defaultdict
 
 import networkx as nx
 import matplotlib.pyplot as plt
-
-abspath = os.path.dirname(os.path.abspath(__file__))
-config_path = os.path.sep.join(abspath.split(os.path.sep)[:-1])
-from config import Config
-with open(os.path.join(config_path, 'custom.cfg'), 'r') as f:
-    cfg = Config(f)
 
 
 class CombCounter:

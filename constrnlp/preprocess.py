@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 # Configuration
-import os
 import re
 
 

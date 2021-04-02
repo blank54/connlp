@@ -12,16 +12,7 @@ Mainly reconstitute the pre-exist python libraries for Natural Language Processi
 - Sehwan Chung (hwani751@snu.ac.kr)
 
 
-# Initialize Workspace (IMPORTANT)
-The user needs _custom.cfg_ file in the workspace. Refer to _sample.cfg_ for the necessary attributes.  
-Refer to the following hierarchy.
-
-```
-WORKSPACE
-    └constrnlp
-        └sample.cfg
-        └...
-    └custom.cfg
-    └YOUR_PYTHON_CODE.py
-    └...
-```
+# Setup
+'''
+pip install constrnlp
+'''
