@@ -12,7 +12,21 @@ Mainly reconstitute the pre-exist python libraries for Natural Language Processi
 - Sehwan Chung (hwani751@snu.ac.kr)
 
 
-# Setup
-```
+# Initialize
+
+## _Setup_
+
+```shell
 pip install constrnlp
+```
+
+## _Test_
+
+If the code below runs with no error, _**constrnlp**_ is installed successfully.
+
+```python
+from constrnlp.test import hello
+hello()
+
+# 'Helloworld'
 ```
