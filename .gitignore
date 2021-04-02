@@ -28,3 +28,7 @@ test/
 *.png
 *.csv
 *.h5
+
+# Configs
+*.cfg
+
