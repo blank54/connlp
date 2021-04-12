@@ -39,3 +39,5 @@ class HWPConverter():
 
 		command = ' '.join(['hwp5txt', '--output', self.com_output, self.com_hwp])
 		os.system(command)
+
+		return 0
