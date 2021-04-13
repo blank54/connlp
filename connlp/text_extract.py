@@ -3,20 +3,20 @@ import re
 from glob import glob
 import hwp5
 
-class HWPConverter():
+class TextConverter():
 	'''
-	A class used to convert a HWP file to a plain text file.
+	A class used to convert a file to a plain text file.
 
 	Methods
 	-------
-	convert
+	hwp2txt
 		| Converts a HWP file to a plain text file. Returns 0 if no error occurs.
 	'''
 	def __init__(self):
 		pass
 
 
-	def convert(self, hwp_fpath, output_fpath):
+	def hwp2txt(self, hwp_fpath, output_fpath):
 		'''
 		A method to convert a HWP file to a plain text file.
 
