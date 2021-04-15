@@ -146,3 +146,24 @@ d2v_model.infer_vector(doc_words=test_doc)
 
 # [4.8494316e-03 -4.3647490e-03  1.1437446e-03 ...]
 ```
+
+# Visualization
+
+## _Visualizer_
+
+_**Visualizer**_ includes several simple tools for text visualization.
+
+### _network_
+
+_**network**_ method provides a word network for tokenized docs.
+
+```python
+from connlp.preprocess import EnglishTokenizer
+from connlp.visualize import Visualizer
+tokenizer = EnglishTokenizer()
+visualizer = Visualizer()
+
+docs = ['I am a boy', 'She is a girl']
+tokenized_docs = [tokenizer.tokenize(text=doc) for doc in docs]
+visualizer.network(docs=tokenized_docs, show=True)
+```
