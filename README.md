@@ -33,7 +33,7 @@ hello()
 # Preprocess
 
 Preprocessing module supports English and Korean.  
-NOTE: No plan exist for other languages currently (2021.04.02.).
+NOTE: No plan for other languages (by 2021.04.02.).
 
 ## _Normalizer_
 
@@ -57,7 +57,92 @@ The ngram-based tokenization is in preparation.
 from connlp.preprocess import EnglishTokenizer
 tokenizer = EnglishTokenizer()
 
-tokenizer.tokenizer(text='I am a boy!')
+tokenizer.tokenize(text='I am a boy!')
 
 # ['I', 'am', 'a', 'boy!']
+```
+
+# Embedding
+
+## _Vectorizer_
+
+_**Vectorizer**_ includes several text embedding methods that have been commonly used for decades.  
+
+### _word2vec_
+
+Word2Vec is a distributed representation language model for word embedding.  
+The Word2vec model trains tokenized docs and returns word vectors.  
+The result is a class of 'gensim.models.word2vec.Word2Vec'.
+
+```python
+from connlp.preprocess import EnglishTokenizer
+from connlp.embedding import Vectorizer
+tokenizer = EnglishTokenizer()
+vectorizer = Vectorizer()
+
+docs = ['I am a boy', 'He is a boy', 'She is a girl']
+tokenized_docs = [tokenizer.tokenize(text=doc) for doc in docs]
+w2v_model = vectorizer.word2vec(docs=tokenized_docs)
+type(w2v_model)
+
+# <class 'gensim.models.word2vec.Word2Vec'>
+```
+
+The user can get a word vector by _**.wv**_ method.
+
+```python
+w2v_model.wv['boy']
+
+# [-2.0130998e-03 -3.5652996e-03  2.7793974e-03 ...]
+```
+
+The Word2Vec model provides the _topn_-most similar word vectors.
+
+```python
+w2v_model.wv.most_similar('boy', topn=3)
+
+# [('He', 0.05311150848865509), ('a', 0.04154288396239281), ('She', -0.029122961685061455)]
+```
+
+### _word2vec (update)_
+
+The user can update the Word2Vec model with new data.
+
+```python
+new_docs = ['Tom is a man', 'Sally is not a boy']
+tokenized_new_docs = [tokenizer.tokenize(text=doc) for doc in new_docs]
+w2v_model_updated = vectorizer.word2vec_update(w2v_model=w2v_model, new_docs=tokenized_new_docs)
+
+w2v_model_updated.wv['man']
+
+# [4.9649975e-03  3.8002312e-04 -1.5773597e-03 ...]
+```
+
+### _doc2vec_
+
+Doc2Vec is a distributed representation language model for longer text (e.g., sentence, paragraph, document) embedding.  
+The Doc2vec model trains tokenized docs with tags and returns document vectors.  
+The result is a class of 'gensim.models.doc2vec.Doc2Vec'.
+
+```python
+from connlp.preprocess import EnglishTokenizer
+from connlp.embedding import Vectorizer
+tokenizer = EnglishTokenizer()
+vectorizer = Vectorizer()
+
+docs = ['I am a boy', 'He is a boy', 'She is a girl']
+tagged_docs = [(idx, tokenizer.tokenize(text=doc)) for idx, doc in enumerate(docs)]
+d2v_model = vectorizer.doc2vec(tagged_docs=tagged_docs)
+type(d2v_model)
+
+# <class 'gensim.models.doc2vec.Doc2Vec'>
+```
+
+The Doc2Vec model can infer a new document.
+
+```python
+test_doc = ['My', 'name', 'is', 'Peter']
+d2v_model.infer_vector(doc_words=test_doc)
+
+# [4.8494316e-03 -4.3647490e-03  1.1437446e-03 ...]
 ```
