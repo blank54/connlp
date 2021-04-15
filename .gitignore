@@ -10,7 +10,6 @@ build/
 
 # Experiments
 tmp/
-test/
 
 # Jupyter notebook
 *.ipynb
