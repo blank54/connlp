@@ -2,21 +2,27 @@
 # -*- coding: utf-8 -*-
 
 # Configuration
-import logging
 from gensim.models import Word2Vec, Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class Vectorizer:
-    def __init__(self, **kwargs):
-    	pass
+	'''
+	A class for text embedding.
 
-    def __verbose_setting(self, verbose):
-        if verbose:
-        	logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-        else:
-        	logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.ERROR)
+	Methods
+	-------
+	word2vec
+		| Develops a new Word2Vec model.
+	word2vec_update
+		| Updates the already trained Word2Vec model.
+	doc2vec
+		| Develops a new Doc2Vec model.
+	'''
+
+    def __init__(self):
+    	pass
 
     ## TODO
     # def tfidf(self, docs):
@@ -35,12 +41,7 @@ class Vectorizer:
             | A list of tokenized docs.
         parameters : dict (optional)
             | A dictionary of user-determined hyperparameters.
-        verbose : boolean (optional)
-        	| To show log information or not. (default : True)
         '''
-
-        verbose = kwargs.get('verbose', True)
-        self.__verbose_setting(verbose)
 
         parameters = kwargs.get('parameters', {})
         model = Word2Vec(
@@ -67,12 +68,7 @@ class Vectorizer:
             | An already developed Word2Vec model.
         new_docs : list
             | A list of tokenized docs to update the Word2Vec model.
-        verbose : boolean (optional)
-        	| To show log information or not. (default : True)
         '''
-
-        verbose = kwargs.get('verbose', True)
-        self.__verbose_setting(verbose)
 
         w2v_model.min_count = 0
         w2v_model.build_vocab(sentences=new_docs, update=True)
@@ -91,12 +87,7 @@ class Vectorizer:
             | E.g.) [(tag1, [w1, w2, ...]), (tag2, [w3, w4, ...]), (tag3, [w5, ...])]
         parameters : dict (optional)
             | A dictionary of user-determined hyperparameters.
-        verbose : boolean (optional)
-        	| To show log information or not. (default : True)
         '''
-
-        verbose = kwargs.get('verbose', True)
-        self.__verbose_setting(verbose)
 
         parameters = kwargs.get('parameters', {})
         docs_for_d2v = [TaggedDocument(words=doc, tags=[tag]) for tag, doc in tagged_docs]
