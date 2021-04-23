@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Configuration
+import logging
 from gensim.models import Word2Vec, Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -9,7 +10,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 class Vectorizer:
     def __init__(self, **kwargs):
-        pass
+    	pass
+
+    def __verbose_setting(self, verbose):
+        if verbose:
+        	logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+        else:
+        	logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.ERROR)
 
     ## TODO
     # def tfidf(self, docs):
@@ -17,8 +24,7 @@ class Vectorizer:
     #     tfidf_model = vectorizer.fit_transform(docs)
     #     return tfidf_model
 
-    ## TODO: verbose
-    def word2vec(self, docs, verbose=True, **kwargs):
+    def word2vec(self, docs, **kwargs):
         '''
         A method to develop a new Word2Vec model.
         Refer to: https://radimrehurek.com/gensim/models/word2vec.html
@@ -26,10 +32,15 @@ class Vectorizer:
         Attributes
         ----------
         docs : list
-            | a list of tokenized docs.
-        parameters : dict
-            | a dictionary of user-determined hyperparameters
+            | A list of tokenized docs.
+        parameters : dict (optional)
+            | A dictionary of user-determined hyperparameters.
+        verbose : boolean (optional)
+        	| To show log information or not. (default : True)
         '''
+
+        verbose = kwargs.get('verbose', True)
+        self.__verbose_setting(verbose)
 
         parameters = kwargs.get('parameters', {})
         model = Word2Vec(
@@ -45,7 +56,7 @@ class Vectorizer:
         )
         return model
 
-    def word2vec_update(self, w2v_model, new_docs, verbose=True):
+    def word2vec_update(self, w2v_model, new_docs, **kwargs):
         '''
         A method to update an already developed Word2Vec model with new docs.
         Refer to: https://radimrehurek.com/gensim/models/word2vec.html
@@ -53,30 +64,39 @@ class Vectorizer:
         Attributes
         ----------
         w2v_model : gensim.models.word2vec.Word2Vec
-            | an already developed Word2Vec model.
+            | An already developed Word2Vec model.
         new_docs : list
-            | a list of tokenized docs to update the Word2Vec model.
+            | A list of tokenized docs to update the Word2Vec model.
+        verbose : boolean (optional)
+        	| To show log information or not. (default : True)
         '''
+
+        verbose = kwargs.get('verbose', True)
+        self.__verbose_setting(verbose)
 
         w2v_model.min_count = 0
         w2v_model.build_vocab(sentences=new_docs, update=True)
         w2v_model.train(sentences=new_docs, total_examples=w2v_model.corpus_count, epochs=w2v_model.iter)
         return w2v_model
 
-    ## TODO: verbose
-    def doc2vec(self, tagged_docs, verbose=True, **kwargs):
+    def doc2vec(self, tagged_docs, **kwargs):
         '''
         A method to develop a new Doc2Vec model.
-        REfer to: https://radimrehurek.com/gensim/models/doc2vec.html
+        Refer to: https://radimrehurek.com/gensim/models/doc2vec.html
 
         Attributes
         ----------
         tagged_docs : list
             | A list of tuples that include tag and tokenized sentence.
             | E.g.) [(tag1, [w1, w2, ...]), (tag2, [w3, w4, ...]), (tag3, [w5, ...])]
-        parameters : dict
-            | a dictionary of user-determined hyperparameters
+        parameters : dict (optional)
+            | A dictionary of user-determined hyperparameters.
+        verbose : boolean (optional)
+        	| To show log information or not. (default : True)
         '''
+
+        verbose = kwargs.get('verbose', True)
+        self.__verbose_setting(verbose)
 
         parameters = kwargs.get('parameters', {})
         docs_for_d2v = [TaggedDocument(words=doc, tags=[tag]) for tag, doc in tagged_docs]
