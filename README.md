@@ -167,3 +167,32 @@ docs = ['I am a boy', 'She is a girl']
 tokenized_docs = [tokenizer.tokenize(text=doc) for doc in docs]
 visualizer.network(docs=tokenized_docs, show=True)
 ```
+
+# Extracting Text
+
+## _TextConverter_
+
+_**TextConverter**_ includes several methods that extract raw text from various types of files (e.g. PDF, HWP) and/or converts the files into plain text files (e.g. TXT).
+
+### _hwp2txt_
+
+_**hwp2txt**_ method converts a HWP file into a plain text file.
+Dependencies: pyhwp package
+
+Install pyhwp (you need to install the pre-release version)
+
+```
+pip install --pre pyhwp
+```
+
+Example
+
+```python
+from connlp.text_extract import TextConverter
+converter = TextConverter()
+
+hwp_fpath = '/data/raw/hwp_file.hwp'
+output_fpath = '/data/processed/extracted_text.txt'
+
+converter.hwp2txt(hwp_fpath, output_fpath) # returns 0 if no error occurs
+```
