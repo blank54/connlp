@@ -196,3 +196,32 @@ output_fpath = '/data/processed/extracted_text.txt'
 
 converter.hwp2txt(hwp_fpath, output_fpath) # returns 0 if no error occurs
 ```
+
+# GPU Utils
+
+## _GPUMonitor_
+
+_**GPUMonitor**_ generates a class to monitor and display the GPU status based on nvidia-smi.  
+Refer to "https://github.com/anderskm/gputil" and "https://data-newbie.tistory.com/561" for usages.
+
+Install _GPUtils_ module with _pip_.
+
+```
+pip install GPUtils
+```
+
+Write your code between the initiation of the _**GPUMonitor**_ and _**monitor.stop()**_.
+
+```python
+from connlp.util import GPUMonitor
+
+monitor = GPUMonitor(delay=3)
+# >>>Write your code here<<<
+monitor.stop()
+
+# | ID | GPU | MEM |
+# ------------------
+# |  0 |  0% |  0% |
+# |  1 |  1% |  0% |
+# |  2 |  0% | 94% |
+```
