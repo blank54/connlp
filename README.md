@@ -68,6 +68,47 @@ tokenizer.tokenize(text='I am a boy!')
 
 _**Vectorizer**_ includes several text embedding methods that have been commonly used for decades.  
 
+### _tfidf_
+
+TF-IDF is the most commonly used technique for word embedding.  
+The TF-IDF model counts the term frequency(TF) and inverse document frequency(IDF) from the given documents.  
+The results included the followings.  
+- TF-IDF Vectorizer (a class of sklearn.feature_extraction.text.TfidfVectorizer')
+- TF-IDF Matrix
+- TF-IDF Vocabulary
+
+```python
+from connlp.preprocess import EnglishTokenizer
+from connlp.embedding import Vectorizer
+tokenizer = EnglishTokenizer()
+vectorizer = Vectorizer()
+
+docs = ['I am a boy', 'He is a boy', 'She is a girl']
+tfidf_vectorizer, tfidf_matrix, tfidf_vocab = vectorizer.tfidf(docs=docs)
+type(tfidf_vectorizer)
+
+# <class 'sklearn.feature_extraction.text.TfidfVectorizer'>
+```
+
+The user can get a document vector by indexing the _**tfidf_matrix**_.
+
+```python
+tfidf_matrix[0]
+
+# (0, 2)    0.444514311537431
+# (0, 0)    0.34520501686496574
+# (0, 1)    0.5844829010200651
+# (0, 5)    0.5844829010200651
+```
+
+The _**tfidf_vocab**_ returns an index for every token.
+
+```python
+print(tfidf_vocab)
+
+# {'i': 5, 'am': 1, 'a': 0, 'boy': 2, 'he': 4, 'is': 6, 'she': 7, 'girl': 3}
+```
+
 ### _word2vec_
 
 Word2Vec is a distributed representation language model for word embedding.  

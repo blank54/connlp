@@ -8,27 +8,45 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class Vectorizer:
-	'''
-	A class for text embedding.
+    '''
+    A class for text embedding.
 
-	Methods
-	-------
-	word2vec
-		| Develops a new Word2Vec model.
-	word2vec_update
-		| Updates the already trained Word2Vec model.
-	doc2vec
-		| Develops a new Doc2Vec model.
-	'''
+    Methods
+    -------
+    tfidf
+        | Develops a new TF-IDF model.
+    word2vec
+        | Develops a new Word2Vec model.
+    word2vec_update
+        | Updates the already trained Word2Vec model.
+    doc2vec
+        | Develops a new Doc2Vec model.
+    '''
 
     def __init__(self):
-    	pass
+        pass
 
-    ## TODO
-    # def tfidf(self, docs):
-    #     vectorizer = TfidfVectorizer()
-    #     tfidf_model = vectorizer.fit_transform(docs)
-    #     return tfidf_model
+    def tfidf(self, docs, do_lower=True, stopwords=None):
+        '''
+        A method to develop a new TF-IDF model.
+        Refer to: https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
+        
+        Attributes
+        ----------
+        docs : list
+            | A list of docs.
+        do_lower : boolean
+            | To lower the text or not. (default : True)
+        stopwords : dict
+            | User-defined stopwords. (default : None)
+        '''
+
+        tfidf_vectorizer = TfidfVectorizer(lowercase=do_lower,
+                                           stop_words=stopwords,
+                                           token_pattern=r'\b\w+\b')
+        tfidf_matrix = tfidf_vectorizer.fit_transform(docs)
+        tfidf_vocab = tfidf_vectorizer.vocabulary_
+        return tfidf_vectorizer, tfidf_matrix, tfidf_vocab
 
     def word2vec(self, docs, **kwargs):
         '''
