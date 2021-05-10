@@ -17,7 +17,7 @@ class CombCounter:
     ----------
     docs : list
         | A list of tokenized words.
-    normalize : Boolean
+    normalize : boll
         | if True, the counter normalizes the weights based on the distance between words within the sentence.
         | elif False, it counts the frequency.
     
@@ -67,7 +67,7 @@ class Visualizer:
         ----------
         docs : list
             | A list of tokenized words.
-        show : Boolean
+        show : bool
             | Whether show the figure or not (default : False).
         
         NOTE: other attributes follow the original documentation of NetworkX.

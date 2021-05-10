@@ -35,9 +35,9 @@ def export_xlsx(data, fpath, index=False, verbose=False):
         | A dictionary of which column lengths are the same.
     fpath : str
         | The file path to export the xlsx.
-    index : Boolean
+    index : bool
         | Write row names or not. (default : False)
-    verbose : Boolean
+    verbose : bool
         | Print fpath or not. (default : False)
 
     NOTE: other attributes follow the original documentation of pandas.DataFrame.
