@@ -107,8 +107,8 @@ class EnglishTokenizer:
         | tokenizes the input sentence.
     '''
 
-    def __init__(self, **kwargs):
-        self.n = kwargs.get('n', 1) # ngram size
+    def __init__(self):
+        pass
 
     def tokenize(self, text):
         '''
@@ -122,5 +122,3 @@ class EnglishTokenizer:
 
         result = [w for w in re.split(' |  |\n', text) if w]
         return result
-
-    ## TODO: split based on ngrams
