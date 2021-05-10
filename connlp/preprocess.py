@@ -11,9 +11,9 @@ class Normalizer:
 
     Attributes
     ----------
-    do_lower : Boolean
+    do_lower : bool
         | To lower the text or not. (default : True)
-    do_marking : Boolean
+    do_marking : bool
         | To mark several tokens to predetermined entities or not. (default : False)
         | The predetermined entities include "LINK", "REF", and "NUM".
 
