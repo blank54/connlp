@@ -188,6 +188,71 @@ d2v_model.infer_vector(doc_words=test_doc)
 # [4.8494316e-03 -4.3647490e-03  1.1437446e-03 ...]
 ```
 
+# Analysis
+
+## _TopicModel_
+
+_**TopicModel**_ is a class for topic modeling based on gensim LDA model.  
+It provides a simple way to train lda model and assign topics to docs.  
+
+_**TopicModel**_ requires two instances.  
+- a dict of docs whose keys are the tag
+- the number of topics for modeling
+
+```python
+from connlp.analysis import TopicModel
+
+num_topics = 2
+docs = {'doc1': ['I', 'am', 'a', 'boy'],
+        'doc2': ['He', 'is', 'a', 'boy'],
+        'doc3': ['Cat', 'on', 'the', 'table'],
+        'doc4': ['Mike', 'is', 'a', 'boy'],
+        'doc5': ['Dog', 'on', 'the', 'table'],
+        }
+
+lda_model = TopicModel(docs=docs, num_topics=num_topics)
+```
+
+### _learn_
+
+The users can train the model with _learn_ method.  
+Unless parameters being provided by the users, the model trains based on default parameters.  
+
+```python
+parameters = {
+    'iterations': 100,
+    'alpha': 0.7,
+    'eta': 0.05,
+}
+lda_model.learn(parameters=parameters)
+```
+
+### _coherence_
+
+_**TopicModel**_ provides coherence value for model evaluation.  
+The coherence value is automatically calculated right after model training.
+
+```python
+print(lda_model.coherence)
+
+# 0.3607990279229385
+```
+
+### _assign_
+
+The users can easily assign the most proper topic to each doc using _assign_ method.  
+After _assign_, the _**TopicModel**_ provides _tag2topic_ and _topic2tag_ instances for convenience.
+
+```python
+lda_model.assign()
+
+print(lda_model.tag2topic)
+print(lda_model.topic2tag)
+
+# defaultdict(<class 'int'>, {'doc1': 1, 'doc2': 1, 'doc3': 0, 'doc4': 1, 'doc5': 0})
+# defaultdict(<class 'list'>, {1: ['doc1', 'doc2', 'doc4'], 0: ['doc3', 'doc5']})
+```
+
 # Visualization
 
 ## _Visualizer_
