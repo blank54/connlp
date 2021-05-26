@@ -215,8 +215,11 @@ lda_model = TopicModel(docs=docs, num_topics=num_topics)
 
 ### _learn_
 
-The users can train the model with _learn_ method.  
+The users can train the model with _learn_ method.
 Unless parameters being provided by the users, the model trains based on default parameters.  
+
+After _learn_, _**TopicModel**_ provides _model_ instance that is a class of <'gensim.models.ldamodel.LdaModel'>
+
 
 ```python
 parameters = {
@@ -225,6 +228,9 @@ parameters = {
     'eta': 0.05,
 }
 lda_model.learn(parameters=parameters)
+type(lda_model.model)
+
+# <class 'gensim.models.ldamodel.LdaModel'>
 ```
 
 ### _coherence_

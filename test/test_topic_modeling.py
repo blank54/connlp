@@ -24,6 +24,7 @@ def test_topic_modeing():
         'eta': 0.05,
     }
     lda_model.learn(parameters=parameters)
+    print(type(lda_model.model))
     print('Coherence: {}'.format(lda_model.coherence))
 
     # Topic assignment
