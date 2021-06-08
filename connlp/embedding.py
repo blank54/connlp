@@ -93,6 +93,19 @@ class Vectorizer:
         w2v_model.train(sentences=new_docs, total_examples=w2v_model.corpus_count, epochs=w2v_model.iter)
         return w2v_model
 
+    def get_word_vectors(self, model):
+        '''
+        A method to extract word vectors from Word2Vec model in the format of dictionary.
+
+        Attributes
+        ----------
+        model : gensim.models.word2vec.Word2Vec
+            | A Word2Vec model.
+        '''
+
+        word_vectors = {w: model.wv[w] for w in model.wv.vocab.keys()}
+        return word_vectors
+
     def doc2vec(self, tagged_docs, **kwargs):
         '''
         A method to develop a new Doc2Vec model.
