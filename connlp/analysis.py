@@ -96,13 +96,13 @@ class TopicModel:
 
 class NER_Labels:
     '''
+    A class that represents the NER labels.
+
     Attributes
     ----------
     label_dict : dict
         | A dict of NER labels of which keys are labels and values are index.
         | The label index should be start with 0.
-    label_list : list
-        | A list of labels including '__PAD__' and '__UNK__'.
     '''
 
     def __init__(self, label_dict):
@@ -135,7 +135,7 @@ class NER_Labels:
 
 class NER_LabeledSentence:
     '''
-    Input of NER model.
+    A class that represents the input of NER model.
 
     Attributes
     ----------
@@ -158,10 +158,21 @@ class NER_LabeledSentence:
 
 class NER_Corpus:
     '''
+    A class that represents the NER corpus.
+
     Attributes
     ----------
     docs : list
         | A list of NER_LabeledSentence.
+    ner_labels : NER_Label
+        | An object of NER_Label.
+    max_sent_len : int
+        | The maximum length of sentences for analysis.
+
+    Methods
+    -------
+    word_embedding
+        | Converts each word to corresponding numeric vector based on Word2Vec.
     '''
 
     def __init__(self, docs, ner_labels, max_sent_len):
@@ -248,12 +259,47 @@ class NER_Corpus:
 
 
 class NER_Dataset:
+    '''
+    A class that represents NER dataset.
+
+    Attributes
+    ----------
+    X : numpy.array
+        | Embedded sentences from NER corpus.
+    Y : numpy.array
+        | Embedded labels from NER corpus.
+    test_size : float
+        | The ratio of test size against the total.
+    '''
+
     def __init__(self, X, Y, test_size):
         self.test_size = test_size
         self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_split(X, Y, test_size=self.test_size)
 
 
 class NER_Model:
+    '''
+    A class to conduct named entity recognition based on Bi-LSTM and CRF.
+    
+    If the model has not been trained yet, it needs to be initialized using "self.initialize()" method.
+    Else if the model is already trained, it can be loaded using "self.load()" method.
+
+    Methods
+    -------
+    initialize
+        | Initialize the NER model with appropriate corpus and parameters.
+    train
+        | Train the NER model with appropriate parameters.
+    evaluate
+        | Show confusion matrix and F1 score of the NER model.
+    predict
+        | Predict the label of named entities from the given sentence.
+    save
+        | Save the NER model and the dataset.
+    load
+        | Initialize and load the NER model.
+    '''
+
     def __init__(self):
         self.ner_labels = ''
         self.word2id = ''
@@ -280,6 +326,17 @@ class NER_Model:
         self.f1_score_average = ''
 
     def initialize(self, ner_corpus, parameters):
+        '''
+        A method to initialize the NER model.
+
+        Attributes
+        ----------
+        ner_corpus : NER_Corpus
+            | Fully developed NER corpus.
+        parameters : dict
+            | Hyperparameters for Bi-LSTM layers.
+        '''
+
         self.word2vector = ner_corpus.word2vector
         self.max_sent_len = ner_corpus.max_sent_len
         self.feature_size = ner_corpus.feature_size
@@ -313,6 +370,15 @@ class NER_Model:
         self.model = model
 
     def train(self, parameters):
+        '''
+        A method to train the NER model.
+
+        Attributes
+        ----------
+        parameters : dict
+            | Hyperparameters for model training.
+        '''
+
         self.test_size = parameters.get('test_size')
         self.batch_size = parameters.get('batch_size')
         self.epochs = parameters.get('epochs')
@@ -385,6 +451,10 @@ class NER_Model:
 
 
     def evaluate(self):
+        '''
+        A method to show model performance.
+        '''
+
         self.__get_confusion_matrix()
         self.__get_f1_score_from_matrix()
 
@@ -398,6 +468,15 @@ class NER_Model:
             print('|    [{}]: {:.03f}'.format(category, f1_score))
 
     def predict(self, sent):
+        '''
+        A method to predict the label of named entities from the given sentence.
+
+        Attributes
+        ----------
+        sent : list
+            | A tokenized sentende.
+        '''
+
         sent_by_id = []
         for w in [w.lower() for w in sent]:
             if w in self.word2id.keys():
@@ -418,19 +497,31 @@ class NER_Model:
 
     def save(self, fpath_model):
         '''
+        A method to save the NER model and the dataset.
+
         fpath_model : str
-            | Filepath of model (.pk).
-        fpath_dataset : str
-            | Filepath of dataset (.pk).
+            | Filepath of the model (.pk).
         '''
 
         self.model.save(fpath_model)
-
         fpath_dataset = '{}-dataset.pk'.format(fpath_model.replace('.pk', ''))
         with open(fpath_dataset, 'wb') as f:
             pk.dump(self.dataset, f)
 
     def load(self, fpath_model, ner_corpus, parameters):
+        '''
+        A method to initialize and load the NER model.
+
+        Attributes
+        ----------
+        fpath_model : str
+            | Filepath of the model (.pk).
+        ner_corpus : NER_Corpus
+            | Fully developed NER corpus.
+        parameters : dict
+            | A dictionary of parameters for Bi-LSTM layers.
+        '''
+
         self.initialize(ner_corpus=ner_corpus, parameters=parameters)
         self.model.load_weights(fpath_model)
         fpath_dataset = '{}-dataset.pk'.format(fpath_model.replace('.pk', ''))
@@ -439,6 +530,17 @@ class NER_Model:
 
 
 class NER_Result:
+    '''
+    A class that represents the NER prediction results
+
+    Attributes
+    ----------
+    input_sent : list
+        | A tokenized input sentence.
+    pred_labels : list
+        | A list of labels that correspond to the input_sent.
+    '''
+
     def __init__(self, input_sent, pred_labels):
         self.sent = input_sent
         self.pred = pred_labels
