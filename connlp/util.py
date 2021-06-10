@@ -3,6 +3,7 @@
 
 # Configuration
 import os
+import numpy as np
 import pandas as pd
 
 import GPUtil
@@ -48,30 +49,11 @@ def export_xlsx(data, fpath, index=False, verbose=False):
 
     makedir(fpath)
     writer = pd.ExcelWriter(fpath)
-    data.to_excel(writer, "Sheet1", index=index)
+    data.to_excel(writer, 'Sheet1', index=index)
     writer.save()
 
     if verbose:
-        print("Saved data as: {}".format(fpath))
-
-
-def f1_score(p, r):
-    '''
-    A method to calculate f1 score.
-
-    Attributes
-    ----------
-    p : float
-        | precision (None-zero)
-    r : float
-        | recall (None-zero)
-    '''
-
-    if p != 0 or r != 0:
-        return (2*p*r)/(p+r)
-    else:
-        return 0
-
+        print('Saved data as: {}'.format(fpath))
 
 
 def accuracy(tp, tn, fp, fn):
