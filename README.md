@@ -370,6 +370,7 @@ parameters = {
 ner_model = NER_Model()
 ner_model.initialize(ner_corpus=ner_corpus, parameters=parameters)
 type(ner_model)
+
 # <class 'connlp.analysis.NER_Model'>
 ```
 
