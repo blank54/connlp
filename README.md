@@ -259,6 +259,180 @@ print(lda_model.topic2tag)
 # defaultdict(<class 'list'>, {1: ['doc1', 'doc2', 'doc4'], 0: ['doc3', 'doc5']})
 ```
 
+## _Named Entity Recognition_
+
+_**NER_Model**_ is a class to conduct named entity recognition using Bi-directional Long-Short Term Memory (Bi-LSTM) and Conditional Random Field (CRF).  
+
+At the beginning, appropriate labels are required.  
+The labels should be numbered with start of 0.
+
+```python
+from connlp.analysis import NER_LAbles
+
+label_dict = {'NON': 0,     #None
+              'PER': 1,     #PERSON
+              'FOD': 2,}    #FOOD
+
+ner_labels = NER_Labels(label_dict=label_dict)
+```
+
+Next, the users should prepare data including sentences and labels, of which each data being matched by the same tag.  
+The tokenized sentences and labels are then combined via _**NER_LabeledSentence**_.  
+With the data, labels, and a proper size of _max_sent_len_ (i.e., the maximum length of sentence for analysis), _**NER_Corpus**_ would be developed.  
+Once the corpus was developed, every data of sentences and labels would be padded with the length of _max_sent_len_.  
+
+```python
+from connlp.preprocess import EnglishTokenizer
+from connlp.analysis import NER_LabeledSentence, NER_Corpus
+tokenizer = EnglishTokenizer()
+
+data_sents = {'sent1': 'Sam likes pizza',
+              'sent2': 'Erik eats pizza',
+              'sent3': 'Erik and Sam are drinking soda',
+              'sent4': 'Flora cooks chicken',
+              'sent5': 'Sam ordered a chicken',
+              'sent6': 'Flora likes chicken sandwitch',
+              'sent7': 'Erik likes to drink soda'}
+data_labels = {'sent1': [1, 0, 2],
+               'sent2': [1, 0, 2],
+               'sent3': [1, 0, 1, 0, 0, 2],
+               'sent4': [1, 0, 2],
+               'sent5': [1, 0, 0, 2],
+               'sent6': [1, 0, 2, 2],
+               'sent7': [1, 0, 0, 0, 2]}
+
+docs = []
+for tag, sent in data_sents.items():
+    words = [str(w) for w in tokenizer.tokenize(text=sent)]
+    labels = data_labels[tag]
+    docs.append(NER_LabeledSentence(tag=tag, words=words, labels=labels))
+
+max_sent_len = 10
+ner_corpus = NER_Corpus(docs=docs, ner_labels=ner_labels, max_sent_len=max_sent_len)
+type(ner_corpus)
+
+# <class 'connlp.analysis.NER_Corpus'>
+```
+
+Every word in the _**NER_Corpus**_ should be embedded into numeric vector space.  
+The user can conduct embedding with Word2Vec which is provided in _**Vectorizer**_ of _**connlp**_.  
+Note that the embedding process of _**NER_Corpus**_ only requires the dictionary of word vectors and the feature size.  
+
+```python
+from connlp.preprocess import EnglishTokenizer
+from connlp.embedding import Vectorizer
+tokenizer = EnglishTokenizer()
+vectorizer = Vectorizer()
+
+tokenized_sents = [tokenizer.tokenize(sent) for sent in data_sents.values()]
+w2v_model = vectorizer.word2vec(docs=tokenized_sents)
+
+word2vector = vectorizer.get_word_vectors(w2v_model)
+feature_size = w2v_model.vector_size
+ner_corpus.word_embedding(word2vector=word2vector, feature_size=feature_size)
+print(ner_corpus.X_embedded)
+
+# [[[-2.40120804e-03  1.74632657e-03  ...]
+#   [-3.57543468e-03  2.86567654e-03  ...]
+#   ...
+#   [ 0.00000000e+00  0.00000000e+00  ...]] ...]
+```
+
+The parameters for Bi-LSTM and model training should be provided, however, they can be composed of a single dictionary.  
+The user should initialize the _**NER_Model**_ with _**NER_Corpus**_ and the parameters.
+
+```python
+from connlp.analysis import NER_Model
+
+parameters = {
+    # Parameters for Bi-LSTM.
+    'lstm_units': 512,
+    'lstm_return_sequences': True,
+    'lstm_recurrent_dropout': 0.2,
+    'dense_units': 100,
+    'dense_activation': 'relu',
+
+    # Parameters for model training.
+    'test_size': 0.3,
+    'batch_size': 1,
+    'epochs': 100,
+    'validation_split': 0.1,
+}
+
+ner_model = NER_Model()
+ner_model.initialize(ner_corpus=ner_corpus, parameters=parameters)
+type(ner_model)
+# <class 'connlp.analysis.NER_Model'>
+```
+
+The user can train the _**NER_Model**_ with customized parameters.  
+The model automatically gets the dataset from the _**NER_Corpus**_.  
+
+```python
+ner_model.train(parameters=parameters)
+
+# Train on 3 samples, validate on 1 samples
+# Epoch 1/100
+# 3/3 [==============================] - 3s 1s/step - loss: 1.4545 - crf_viterbi_accuracy: 0.3000 - val_loss: 1.0767 - val_crf_viterbi_accuracy: 0.8000
+# Epoch 2/100
+# 3/3 [==============================] - 0s 74ms/step - loss: 0.8602 - crf_viterbi_accuracy: 0.7000 - val_loss: 0.5287 - val_crf_viterbi_accuracy: 0.8000
+# ...
+```
+
+The model performance can be shown in the aspects of confusion matrix and F1 score.
+
+```python
+ner_model.evaluate()
+
+# |--------------------------------------------------
+# |Confusion Matrix:
+# [[ 3  0  3  6]
+#  [ 1  3  0  4]
+#  [ 0  0  2  2]
+#  [ 4  3  5 12]]
+# |--------------------------------------------------
+# |F1 Score: 0.757
+# |--------------------------------------------------
+# |    [NON]: 0.600
+# |    [PER]: 0.857
+# |    [FOD]: 0.571
+```
+
+The user can save the _**NER_Model**_.  
+The model would save the model itself ("\<FileName\>.pk") and the dataset ("\<FileName\>-dataset.pk") that was used in model development.  
+Note that the directory should exist before saving the model.  
+
+```python
+from connlp.util import makedir
+
+fpath_model = 'test/ner/model.pk'
+makedir(fpath=fpath_model)
+ner_model.save(fpath_model=fpath_model)
+```
+
+If the user wants to load the already trained model, just call the model and load.  
+
+```python
+fpath_model = 'test/ner/model.pk'
+ner_model = NER_Model()
+ner_model.load(fpath_model=fpath_model, ner_corpus=ner_corpus, parameters=parameters)
+```
+
+_**NER_Model**_ can conduct a new NER task on the given sentence.  
+The result is a class of _**NER_Result**_.  
+
+```python
+from connlp.preprocess import EnglishTokenizer
+vectorizer = Vectorizer()
+
+new_sent = 'Tom eats apple'
+tokenized_sent = tokenizer.tokenize(new_sent)
+ner_result = ner_model.predict(sent=tokenized_sent)
+print(ner_result)
+
+# Tom/PER eats/NON apple/FOD
+```
+
 # Visualization
 
 ## _Visualizer_
