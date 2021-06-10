@@ -6,12 +6,13 @@ import os
 file_path = os.path.dirname(os.path.abspath(__file__))
 config_path = os.path.sep.join(file_path.split(os.path.sep)[:-1])
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = str(1) #Do not print INFO
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = str(2) #Do not print INFO
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
-os.environ['CUDA_VISIBLE_DEVICES'] = str(2)
+os.environ['CUDA_VISIBLE_DEVICES'] = str(1)
 
 import sys
 sys.path.append(config_path)
+from connlp.util import makedir
 from connlp.preprocess import EnglishTokenizer
 from connlp.embedding import Vectorizer
 from connlp.analysis import NER_LabeledSentence, NER_Labels, NER_Corpus, NER_Model
@@ -43,40 +44,55 @@ def develop_ner_corpus():
     ner_corpus = NER_Corpus(docs=docs, ner_labels=ner_labels, max_sent_len=max_sent_len)
     return ner_corpus
 
-def develop_ner_model():
-    global parameters
-
+def develop_ner_model(ner_corpus, parameters):
     word2vector, feature_size = w2v_embedding()
-    ner_corpus = develop_ner_corpus()
     ner_corpus.word_embedding(word2vector=word2vector, feature_size=feature_size)
-
     ner_model = NER_Model()
     ner_model.initialize(ner_corpus=ner_corpus, parameters=parameters)
     return ner_model
 
-def train_ner_model():
-    global ner_model
-
+def train_ner_model(ner_model):
     ner_model.train(parameters=parameters)
     ner_model.evaluate()
+
+def save_ner_model(fpath_model, ner_model):
+    makedir(fpath=fpath_model)
+    ner_model.save(fpath_model=fpath_model)
+
+def load_ner_model(fpath_model, ner_corpus, parameters):
+    ner_model = NER_Model()
+    ner_model.load(fpath_model=fpath_model, ner_corpus=ner_corpus, parameters=parameters)
+    return ner_model
+
+def predict_ner(ner_model, sent):
+    tokenized_sent = tokenizer.tokenize(sent)
+    ner_result = ner_model.predict(sent=tokenized_sent)
+    print(ner_result)
 
 
 ## Run
 if __name__ == '__main__':
-    label_dict = {'NON': 0,
-                  'ORG': 1,}
 
-    data_sents = {'sent1': 'Sam works at Samsung',
-                  'sent2': 'Sam likes to eat pizza',
-                  'sent3': 'Peter and Sam are friends',
-                  'sent4': 'Flora plays basketball',}
-    data_labels = {'sent1': [1, 0, 0, 0],
-                   'sent2': [1, 0, 0, 0, 0],
-                   'sent3': [1, 0, 1, 0, 0],
-                   'sent4': [1, 0, 0],}
+
+    label_dict = {'NON': 0,
+                  'PER': 1,     #PERSON
+                  'FOD': 2,}    #FOOD
+    data_sents = {'sent1': 'Sam likes pizza',
+                  'sent2': 'Erik eats pizza',
+                  'sent3': 'Erik and Sam are drinking soda',
+                  'sent4': 'Flora cooks chicken',
+                  'sent5': 'Sam ordered a chicken',
+                  'sent6': 'Flora likes chicken sandwitch',
+                  'sent7': 'Erik likes to drink soda'}
+    data_labels = {'sent1': [1, 0, 2],
+                   'sent2': [1, 0, 2],
+                   'sent3': [1, 0, 1, 0, 0, 2],
+                   'sent4': [1, 0, 2],
+                   'sent5': [1, 0, 0, 2],
+                   'sent6': [1, 0, 2, 2],
+                   'sent7': [1, 0, 0, 0, 2]}
 
     max_sent_len = 10
-
     parameters = {
         'lstm_units': 512,
         'lstm_return_sequences': True,
@@ -85,9 +101,22 @@ if __name__ == '__main__':
         'dense_activation': 'relu',
         'test_size': 0.3,
         'batch_size': 1,
-        'epochs': 2,
+        'epochs': 100,
         'validation_split': 0.1,
     }
 
-    ner_model = develop_ner_model()
-    train_ner_model()
+    ## Train NER model.
+    ner_corpus = develop_ner_corpus()
+    ner_model = develop_ner_model(ner_corpus, parameters)
+    train_ner_model(ner_model)
+
+    ## Save NER model.
+    fpath_model = 'test/ner/model.pk'
+    save_ner_model(fpath_model=fpath_model, ner_model=ner_model)
+
+    ## Load NER model.
+    ner_model = load_ner_model(fpath_model=fpath_model, ner_corpus=ner_corpus, parameters=parameters)
+
+    ## Predict new sentence.
+    sent = 'Tom eats apple'
+    predict_ner(ner_model=ner_model, sent=sent)

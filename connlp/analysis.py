@@ -1,23 +1,23 @@
-#!/usr/bin/env python
+#!/usr/bin/env python -W ignore::DeprecationWarning
 # -*- coding: utf-8 -*-
 
 # Configuration
+import warnings
+warnings.filterwarnings(action='ignore', category=DeprecationWarning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=UserWarning)
+
 import numpy as np
 import pickle as pk
 import itertools
 from copy import deepcopy
 from collections import defaultdict
 
-from gensim.models.ldamodel import LdaModel
 import gensim.corpora as corpora
 from gensim.models import CoherenceModel
-
+from gensim.models.ldamodel import LdaModel
 from sklearn.model_selection import train_test_split
 
-from keras import Model
-from keras.optimizers import Adam
-from keras_bert import Tokenizer
-from keras_bert import load_trained_model_from_checkpoint
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, Input
 from keras.layers import Dense, Bidirectional, LSTM, TimeDistributed
@@ -118,7 +118,7 @@ class NER_Labels:
         self.label_dict['__PAD__'] = cnt
         self.label_dict['__UNK__'] = cnt+1
 
-        self.label_list = list(self.label_dict.values())
+        self.label_list = list(self.label_dict.keys())
         self.label2id = self.label_dict
         self.id2label = {int(i): str(l) for i, l in enumerate(self.label_list)}
 
@@ -164,10 +164,10 @@ class NER_Corpus:
         | A list of NER_LabeledSentence.
     '''
 
-    def __init__(self, docs, ner_labels, **kwargs):
+    def __init__(self, docs, ner_labels, max_sent_len):
         self.docs = docs
         self.ner_labels = ner_labels
-        self.max_sent_len = kwargs.get('max_sent_len', 100)
+        self.max_sent_len = max_sent_len
 
         self.words = ''
         self.word2id = ''
@@ -183,6 +183,9 @@ class NER_Corpus:
 
         self.__get_words()
         self.__sentence_padding()
+
+    def __len__(self):
+        return len(self.docs)
 
     def __get_words(self):
         self.words = list(set(itertools.chain(*[doc.words for doc in self.docs])))
@@ -230,8 +233,8 @@ class NER_Corpus:
         self.word2vector['__PAD__'] = np.zeros(self.feature_size)
         self.word2vector['__UNK__'] = np.zeros(self.feature_size)
 
-        X_embedded = np.zeros((len(self.words), self.max_sent_len, self.feature_size))
-        Y_embedded = np.zeros((len(self.words), self.max_sent_len, len(self.ner_labels)))
+        X_embedded = np.zeros((self.__len__(), self.max_sent_len, self.feature_size))
+        Y_embedded = np.zeros((self.__len__(), self.max_sent_len, len(self.ner_labels)))
         
         for i in range(len(self.docs)):
             for j, word_id in enumerate(self.X_words_pad[i]):
@@ -277,6 +280,7 @@ class NER_Model:
         self.f1_score_average = ''
 
     def initialize(self, ner_corpus, parameters):
+        self.word2vector = ner_corpus.word2vector
         self.max_sent_len = ner_corpus.max_sent_len
         self.feature_size = ner_corpus.feature_size
         self.ner_labels = ner_corpus.ner_labels
@@ -346,7 +350,9 @@ class NER_Model:
 
         for i in range(len(pred_labels)):
             for j, pred in enumerate(pred_labels[i]):
-                matrix[self.ner_labels.label2id[test_labels[i][j]], self.ner_labels.label2id[pred]] += 1
+                row = self.ner_labels.label2id[test_labels[i][j]]
+                col = self.ner_labels.label2id[pred]
+                matrix[row, col] += 1
                 
         for i in range(matrix_size):
             matrix[i, matrix_size] = sum(matrix[i, 0:matrix_size])
@@ -377,9 +383,10 @@ class NER_Model:
         self.f1_score_list = f1_score_list
         self.f1_score_average = f1_score_average
 
+
     def evaluate(self):
         self.__get_confusion_matrix()
-        self.__get_f1_score()
+        self.__get_f1_score_from_matrix()
 
         print('|--------------------------------------------------')
         print('|Confusion Matrix:')
@@ -409,7 +416,7 @@ class NER_Model:
         pred_labels = self.__pred2labels(sents=sent_pad, prediction=prediction)[0]
         return NER_Result(input_sent=sent, pred_labels=pred_labels)
 
-    def save(self, fpath_model, fpath_dataset):
+    def save(self, fpath_model):
         '''
         fpath_model : str
             | Filepath of model (.pk).
@@ -418,12 +425,15 @@ class NER_Model:
         '''
 
         self.model.save(fpath_model)
+
+        fpath_dataset = '{}-dataset.pk'.format(fpath_model.replace('.pk', ''))
         with open(fpath_dataset, 'wb') as f:
             pk.dump(self.dataset, f)
 
-    def load(self, fpath_model, fpath_dataset, ner_corpus, parameters):
+    def load(self, fpath_model, ner_corpus, parameters):
         self.initialize(ner_corpus=ner_corpus, parameters=parameters)
         self.model.load_weights(fpath_model)
+        fpath_dataset = '{}-dataset.pk'.format(fpath_model.replace('.pk', ''))
         with open(fpath_dataset, 'rb') as f:
             self.dataset = pk.load(f)
 
