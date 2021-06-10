@@ -261,13 +261,15 @@ print(lda_model.topic2tag)
 
 ## _Named Entity Recognition_
 
+### _Labels_
+
 _**NER_Model**_ is a class to conduct named entity recognition using Bi-directional Long-Short Term Memory (Bi-LSTM) and Conditional Random Field (CRF).  
 
 At the beginning, appropriate labels are required.  
 The labels should be numbered with start of 0.
 
 ```python
-from connlp.analysis import NER_LAbles
+from connlp.analysis import NER_Lables
 
 label_dict = {'NON': 0,     #None
               'PER': 1,     #PERSON
@@ -275,6 +277,8 @@ label_dict = {'NON': 0,     #None
 
 ner_labels = NER_Labels(label_dict=label_dict)
 ```
+
+### _Corpus_
 
 Next, the users should prepare data including sentences and labels, of which each data being matched by the same tag.  
 The tokenized sentences and labels are then combined via _**NER_LabeledSentence**_.  
@@ -314,6 +318,8 @@ type(ner_corpus)
 # <class 'connlp.analysis.NER_Corpus'>
 ```
 
+### _Word Embedding_
+
 Every word in the _**NER_Corpus**_ should be embedded into numeric vector space.  
 The user can conduct embedding with Word2Vec which is provided in _**Vectorizer**_ of _**connlp**_.  
 Note that the embedding process of _**NER_Corpus**_ only requires the dictionary of word vectors and the feature size.  
@@ -337,6 +343,8 @@ print(ner_corpus.X_embedded)
 #   ...
 #   [ 0.00000000e+00  0.00000000e+00  ...]] ...]
 ```
+
+### _Model Initialization_
 
 The parameters for Bi-LSTM and model training should be provided, however, they can be composed of a single dictionary.  
 The user should initialize the _**NER_Model**_ with _**NER_Corpus**_ and the parameters.
@@ -365,6 +373,8 @@ type(ner_model)
 # <class 'connlp.analysis.NER_Model'>
 ```
 
+### _Model Training_
+
 The user can train the _**NER_Model**_ with customized parameters.  
 The model automatically gets the dataset from the _**NER_Corpus**_.  
 
@@ -378,6 +388,8 @@ ner_model.train(parameters=parameters)
 # 3/3 [==============================] - 0s 74ms/step - loss: 0.8602 - crf_viterbi_accuracy: 0.7000 - val_loss: 0.5287 - val_crf_viterbi_accuracy: 0.8000
 # ...
 ```
+
+### _Model Evaluation_
 
 The model performance can be shown in the aspects of confusion matrix and F1 score.
 
@@ -398,6 +410,8 @@ ner_model.evaluate()
 # |    [FOD]: 0.571
 ```
 
+### _Save_
+
 The user can save the _**NER_Model**_.  
 The model would save the model itself ("\<FileName\>.pk") and the dataset ("\<FileName\>-dataset.pk") that was used in model development.  
 Note that the directory should exist before saving the model.  
@@ -410,6 +424,8 @@ makedir(fpath=fpath_model)
 ner_model.save(fpath_model=fpath_model)
 ```
 
+### _Load_
+
 If the user wants to load the already trained model, just call the model and load.  
 
 ```python
@@ -417,6 +433,8 @@ fpath_model = 'test/ner/model.pk'
 ner_model = NER_Model()
 ner_model.load(fpath_model=fpath_model, ner_corpus=ner_corpus, parameters=parameters)
 ```
+
+### _Prediction_
 
 _**NER_Model**_ can conduct a new NER task on the given sentence.  
 The result is a class of _**NER_Result**_.  
