@@ -264,9 +264,7 @@ print(lda_model.topic2tag)
 Before using NER modules, the user should install proper versions of TensorFlow and Keras.  
 
 ```shell
-pip install tensorflow==1.14.0
-pip install tensorflow-gpu==1.14.0
-pip install keras==2.3.1
+pip install config==0.4.2 gensim==3.8.1 gpustat==0.6.0 GPUtil==1.4.0 h5py==2.10.0 JPype1==0.7.1 Keras==2.2.4 konlpy==0.5.2 nltk==3.4.5 numpy==1.18.1 pandas==1.0.1 scikit-learn==0.22.1 scipy==1.4.1 silence-tensorflow==1.1.1 soynlp==0.0.493 tensorflow==1.14.0 tensorflow-gpu==1.14.0
 ```
 
 The modules might require the module of _keras-contrib_.  
