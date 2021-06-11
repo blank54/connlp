@@ -6,7 +6,6 @@ import os
 file_path = os.path.dirname(os.path.abspath(__file__))
 config_path = os.path.sep.join(file_path.split(os.path.sep)[:-1])
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = str(2) #Do not print INFO
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
 os.environ['CUDA_VISIBLE_DEVICES'] = str(1)
 

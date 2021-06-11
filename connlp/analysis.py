@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 
 # Configuration
+from silence_tensorflow import silence_tensorflow
+silence_tensorflow()
+
 import warnings
 warnings.filterwarnings(action='ignore', category=DeprecationWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=UserWarning)
 
+import os
 import numpy as np
 import pickle as pk
 import itertools
