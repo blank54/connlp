@@ -215,8 +215,8 @@ lda_model = TopicModel(docs=docs, num_topics=num_topics)
 
 ### _learn_
 
-The users can train the model with _learn_ method.
-Unless parameters being provided by the users, the model trains based on default parameters.  
+The user can train the model with _learn_ method.
+Unless parameters being provided by the user, the model trains based on default parameters.  
 
 After _learn_, _**TopicModel**_ provides _model_ instance that is a class of <'gensim.models.ldamodel.LdaModel'>
 
@@ -246,7 +246,7 @@ print(lda_model.coherence)
 
 ### _assign_
 
-The users can easily assign the most proper topic to each doc using _assign_ method.  
+The user can easily assign the most proper topic to each doc using _assign_ method.  
 After _assign_, the _**TopicModel**_ provides _tag2topic_ and _topic2tag_ instances for convenience.
 
 ```python
@@ -261,6 +261,23 @@ print(lda_model.topic2tag)
 
 ## _Named Entity Recognition_
 
+Before using NER modules, the user should install proper versions of TensorFlow and Keras.  
+
+```shell
+pip install tensorflow==1.14.0
+pip install tensorflow-gpu==1.14.0
+pip install keras==2.3.1
+```
+
+The modules might require the module of _keras-contrib_.  
+The user can install the module by following the below.  
+
+```shell
+git clone https://www.github.com/keras-team/keras-contrib.git 
+cd keras-contrib 
+python setup.py install
+```
+
 ### _Labels_
 
 _**NER_Model**_ is a class to conduct named entity recognition using Bi-directional Long-Short Term Memory (Bi-LSTM) and Conditional Random Field (CRF).  
@@ -269,7 +286,7 @@ At the beginning, appropriate labels are required.
 The labels should be numbered with start of 0.
 
 ```python
-from connlp.analysis import NER_Lables
+from connlp.analysis import NER_Labels
 
 label_dict = {'NON': 0,     #None
               'PER': 1,     #PERSON
@@ -280,7 +297,7 @@ ner_labels = NER_Labels(label_dict=label_dict)
 
 ### _Corpus_
 
-Next, the users should prepare data including sentences and labels, of which each data being matched by the same tag.  
+Next, the user should prepare data including sentences and labels, of which each data being matched by the same tag.  
 The tokenized sentences and labels are then combined via _**NER_LabeledSentence**_.  
 With the data, labels, and a proper size of _max_sent_len_ (i.e., the maximum length of sentence for analysis), _**NER_Corpus**_ would be developed.  
 Once the corpus was developed, every data of sentences and labels would be padded with the length of _max_sent_len_.  
