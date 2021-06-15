@@ -3,6 +3,7 @@
 
 # Configuration
 import re
+from math import exp
 
 
 class Normalizer:
@@ -121,4 +122,92 @@ class EnglishTokenizer:
         '''
 
         result = [w for w in re.split(' |  |\n', text) if w]
+        return result
+
+
+class KoreanTokenizer:
+    '''
+    A class to tokenize a Korean sentence.
+
+    Attributes
+    ----------
+    **kwargs
+        | Keyword arguments for WordExtractor object (see soynlp.word.WordExtractor)
+
+    Methods
+    -------
+    train
+        | Trains KoreanTokenizer on a corpus
+    tokenize
+        | Tokenizes the input sentence and returns its tokens
+    
+    '''
+
+    from soynlp.word import WordExtractor
+    from soynlp.utils import check_corpus
+    from soynlp.utils import DoublespaceLineCorpus
+    from soynlp.tokenizer import LTokenizer
+
+    def __init__(self, **kwargs):
+        if 'sents' in kwargs.keys():
+            del kwargs['sents']
+            print("WARNING: 'sents' argument is ignored.")
+
+        self.WordExtractor = WordExtractor(**kwargs)
+
+    def train(self, text, **kwargs):
+        '''
+        A method to train the KoreanTokenizer object.
+
+        Attributes
+        ----------
+        text : iterable or DoublespaceLineCorpus
+            | A input text in any iterable type (e.g. list)
+            | or a DoublespaceLineCorpus object (see soynlp.utils.DoublespaceLineCorpus)
+        **kwargs
+            | Keyword arguments for WordExtractor.train() method (see soynlp.word.WordExtractor.train)
+        '''
+
+        if 'sents' in kwargs.keys():
+            del kwargs['sents']
+            print("WARNING: 'sents' argument is ignored; WordExtractor is trained on 'text' argument only.")
+        
+        self.WordExtractor.train(text, **kwargs)
+        self.words = self.WordExtractor.extract()
+
+        def calculate_word_score(word, score):
+            cohesion = score.cohesion_forward
+            branching_entropy = score.right_branching_entropy
+            
+            word_score = cohesion * exp(branching_entropy)
+
+            return word_score
+
+        self.word_score = {word:calculate_word_score(word, score) for word, score in words.items()}
+
+    def tokenize(self, text, **kwargs):
+        '''
+        A method to tokenize the input text
+
+        Attributes
+        ----------
+        text : str
+            | An input text in str type
+
+        **kwargs
+            | Keyword arguments for LTokenizer.tokenize() method (see soynlp.tokenizer.LTokenizer.tokenize)
+        '''
+        
+        if 'sentence' in kwargs.keys():
+            del kwargs['sentence']
+            print("WARNING: 'sentence' argument is ignored; word_tokenizer tokenizes 'text' argument only.")
+
+        if not self.word_score:
+            print('KoreanTokenizer should be trained first, before tokenizing.')
+            return
+        
+        self.tokenizer = LTokenizer(scores=self.word_score)
+        
+        result = self.tokenizer.tokenize(text, **kwargs)
+
         return result
