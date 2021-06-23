@@ -8,6 +8,7 @@ Mainly reconstitute the pre-exist python libraries for Natural Language Processi
 ## _Contributors_
 - Seonghyeon Boris Moon (blank54@snu.ac.kr, https://github.com/blank54/)
 - Sehwan Chung (hwani751@snu.ac.kr)
+- Jungyeon Kim (janykjy@snu.ac.kr)
 
 # Initialize
 
@@ -257,7 +258,7 @@ print(lda_model.topic2tag)
 # defaultdict(<class 'list'>, {1: ['doc1', 'doc2', 'doc4'], 0: ['doc3', 'doc5']})
 ```
 
-## _Named Entity Recognition_
+## _NamedEntityRecognition_
 
 Before using NER modules, the user should install proper versions of TensorFlow and Keras.  
 
