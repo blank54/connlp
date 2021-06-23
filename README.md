@@ -71,7 +71,7 @@ A _**KoreanTokenizer**_ object first needs to be trained on (unlabeled) corpus. 
 
 ```python
 from connlp.preprocess import KoreanTokenizer
-tokenizer = KoreanTokenizer() # see 'soynlp' for detailed explanation on keyword arguments
+tokenizer = KoreanTokenizer(min_frequency=0) # see 'soynlp' for detailed explanation on keyword arguments
 
 docs = ['코퍼스의 첫 번째 문서입니다.', '두 번째 문서']
 
