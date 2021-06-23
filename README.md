@@ -61,6 +61,34 @@ tokenizer.tokenize(text='I am a boy!')
 # ['I', 'am', 'a', 'boy!']
 ```
 
+## _KoreanTokenizer_
+
+_**KoreanTokenizer**_ tokenizes the input text in Korean, and is based on _**soynlp**_ (https://github.com/lovit/soynlp), an unsupervised text analyzer in Korean.
+
+### _train_
+
+A _**KoreanTokenizer**_ object first needs to be trained on (unlabeled) corpus. 'Word score' is calculated for every subword in the corpus.
+
+```python
+from connlp.preprocess import KoreanTokenizer
+tokenizer = KoreanTokenizer() # see 'soynlp' for detailed explanation on keyword arguments
+
+docs = ['코퍼스의 첫 번째 문서입니다.', '두 번째 문서']
+
+tokenizer.train(text=docs)
+print(tokenizer.word_score)
+```
+
+### _tokenize_
+
+Tokenization is based on the 'word score' calculated from _**KoreanTokenizer.train**_ method. 
+For each blank-separated token, a subword that has the maximum 'word score' is selectd as an individual 'word' and separated with the remaining part.
+
+```python
+doc = docs[0] # '코퍼스의 첫 번째 문서입니다.'
+tokenizer.tokenize(doc)
+```
+
 # Embedding
 
 ## _Vectorizer_
