@@ -73,10 +73,12 @@ A _**KoreanTokenizer**_ object first needs to be trained on (unlabeled) corpus. 
 from connlp.preprocess import KoreanTokenizer
 tokenizer = KoreanTokenizer(min_frequency=0) # see 'soynlp' for detailed explanation on keyword arguments
 
-docs = ['코퍼스의 첫 번째 문서입니다.', '두 번째 문서']
+docs = ['코퍼스의 첫 번째 문서입니다.', '두 번째 문서입니다.', '마지막 문서']
 
 tokenizer.train(text=docs)
 print(tokenizer.word_score)
+
+# {'서': 0.0, '코': 0.0, '째': 0.0, '.': 0.0, '의': 0.0, '마': 0.0, '막': 0.0, '번': 0.0, '문': 0.0, '코퍼': 1.0, '번째': 1.0, '마지': 1.0, '문서': 1.0, '코퍼스': 1.0, '문서입': 0.816496580927726, '마지막': 1.0, '코퍼스의': 1.0, '문서입니': 0.8735804647362989, '문서입니다': 0.9036020036098448, '문서입니다.': 0.9221079114817278}
 ```
 
 ### _tokenize_
@@ -87,6 +89,8 @@ For each blank-separated token, a subword that has the maximum 'word score' is s
 ```python
 doc = docs[0] # '코퍼스의 첫 번째 문서입니다.'
 tokenizer.tokenize(doc)
+
+# ['코퍼스의', '첫', '번째', '문서', '입니다.']
 ```
 
 # Embedding
