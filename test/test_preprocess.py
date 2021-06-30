@@ -9,7 +9,7 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 config_path = os.path.sep.join(file_path.split(os.path.sep)[:-1])
 sys.path.append(config_path)
 from connlp.preprocess import EnglishTokenizer, Normalizer, KoreanTokenizer
-tokenizer = EnglishTokenizer()
+eng_tokenizer = EnglishTokenizer()
 normalizer = Normalizer()
 kor_tokenizer = KoreanTokenizer(min_frequency=0)
 
@@ -27,7 +27,7 @@ def test_english_tokenizer():
     global docs
     
     for doc in docs:
-        tokenized_doc = tokenizer.tokenize(text=doc)
+        tokenized_doc = eng_tokenizer.tokenize(text=doc)
         print(tokenized_doc)
 
 # Korean Tokenizer
