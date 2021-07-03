@@ -4,6 +4,9 @@
 # Configuration
 import re
 from math import exp
+from soynlp.word import WordExtractor
+from soynlp.utils import DoublespaceLineCorpus
+from soynlp.tokenizer import LTokenizer
 
 
 class Normalizer:
@@ -143,11 +146,6 @@ class KoreanTokenizer:
     
     '''
 
-    from soynlp.word import WordExtractor
-    from soynlp.utils import check_corpus
-    from soynlp.utils import DoublespaceLineCorpus
-    from soynlp.tokenizer import LTokenizer
-
     def __init__(self, **kwargs):
         if 'sents' in kwargs.keys():
             del kwargs['sents']
@@ -183,7 +181,7 @@ class KoreanTokenizer:
 
             return word_score
 
-        self.word_score = {word:calculate_word_score(word, score) for word, score in words.items()}
+        self.word_score = {word:calculate_word_score(word, score) for word, score in self.words.items()}
 
     def tokenize(self, text, **kwargs):
         '''
