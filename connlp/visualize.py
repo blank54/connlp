@@ -7,6 +7,11 @@ from collections import defaultdict
 
 import networkx as nx
 import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+from wordcloud import STOPWORDS
+import pandas as pd
+import sys
+from collections import Counter
 
 
 class CombCounter:
@@ -102,3 +107,24 @@ class Visualizer:
 
         if show:
             plt.show()
+            
+            
+            
+            
+    def wordcloud(self, data, stopword_list):
+    
+        self.data = data
+        self.stopword_list = stopword_list    
+ 
+        stopwords = set(STOPWORDS)
+        for word in self.stopword_list:
+            stopwords.add(word)
+        
+        wc = WordCloud(font_path='font/NanumGothic.ttf', background_color='white', stopwords=stopwords)
+        cloud = wc.generate(self.data)
+            
+        plt.figure(figsize=(22,22))
+        plt.imshow(cloud, interpolation='lanczos')
+        plt.axis('off') 
+        plt.show() 
+        plt.savefig(fname = 'wordcloud.png')
