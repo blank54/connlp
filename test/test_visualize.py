@@ -20,6 +20,7 @@ def test_word_network(docs):
 
     visualizer = Visualizer()
     visualizer.network(docs=tokenized_docs, show=True)
+    visualizer.wordcloud(docs=tokenized_docs, stopword_list)
 
 
 ## Run
