@@ -83,7 +83,7 @@ print(tokenizer.word_score)
 
 ### _tokenize_
 
-Tokenization is based on the 'word score' calculated from _**KoreanTokenizer.train**_ method. 
+Tokenization is based on the 'word score' calculated from _**KoreanTokenizer.train**_ method.  
 For each blank-separated token, a subword that has the maximum 'word score' is selectd as an individual 'word' and separated with the remaining part.
 
 ```python
@@ -95,7 +95,7 @@ tokenizer.tokenize(doc)
 
 ## _StopwordRemover_
 
-_**StopwordRemover**_ removes stopwords from a given sentence based on the user-customized stopword list.
+_**StopwordRemover**_ removes stopwords from a given sentence based on the user-customized stopword list.  
 Before utilizing _**StopwordRemover**_ the user should normalize and tokenize the docs.
 
 ```python
@@ -119,7 +119,7 @@ print(tokenized_docs)
 # [['i', 'am', 'a', 'boy'], ['he', 'is', 'a', 'boy'], ['she', 'is', 'a', 'girl']]
 ```
 
-The user should prepare a customized stopword list (i.e., _stoplist_).
+The user should prepare a customized stopword list (i.e., _stoplist_).  
 The _stoplist_ should include user-customized stopwords divided by '\n' and the file should be in ".txt" format.
 
 ```text
@@ -128,7 +128,7 @@ is
 am
 ```
 
-Initiate the _**StopwordRemover**_ with appropriate filepath of user-customized stopword list.
+Initiate the _**StopwordRemover**_ with appropriate filepath of user-customized stopword list.  
 If the stoplist is absent at the filepath, the stoplist would be ramain as a blank list.
 
 ```python
