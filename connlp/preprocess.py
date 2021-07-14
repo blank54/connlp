@@ -2,8 +2,12 @@
 # -*- coding: utf-8 -*-
 
 # Configuration
+import os
 import re
+import itertools
 from math import exp
+from collections import Counter
+
 from soynlp.word import WordExtractor
 from soynlp.utils import DoublespaceLineCorpus
 from soynlp.tokenizer import LTokenizer
@@ -34,6 +38,7 @@ class Normalizer:
         self.do_marking = do_marking
 
     def __remove_trash_char(self, text):
+        text = text.replace('?', '')
         text = re.sub('[^ \'\?\./0-9a-zA-Zㄱ-힣\n]', '', text)
 
         # Remove debris from format conversion
@@ -237,7 +242,6 @@ class KoreanTokenizer:
 
             return result
 
-
     def extract_noun(self, text):
         '''
         A method to extract nouns from input text
@@ -255,6 +259,147 @@ class KoreanTokenizer:
 
         if self.pre_trained == True:
             return self.analyzer.nouns(text)
-        
+
+
+class StopwordRemover:
+    '''
+    A class to remove stopwords based on user-customized stopword list.
+
+    Attributes
+    ----------
+    fpath_stoplist : str
+        | The filepath of user-customized stopword list.    
+    stoplist : list
+        | The list of stopwords.
+
+    Methods
+    -------
+    initiate
+        | To assign fpath_stoplist.
+    count_freq_words
+        | A method to count frequently appeared words from documents.
+        | The user can figure out the representatives of stopwords with this method.
+    check_removed_words
+        | A method to check the stopwords were successfully removed.
+    load_stoplist
+        | A method to load user-customized stopword list.
+    write_stoplist
+        | A method to write sorted and set stopword list.
+    remove
+        | A method to remove stopwords from a tokenized sent.
+    '''
+
+    def __init__(self):
+        self.fpath_stoplist = ''
+        self.stoplist = []
+
+    def initiate(self, fpath_stoplist):
+        '''
+        To assign fpath_stoplist.
+
+        Attributes
+        ----------
+        fpath_stoplist : str
+            | The filepath of user-customized stopword list.
+        '''
+
+        self.fpath_stoplist = fpath_stoplist
+
+    def count_freq_words(self, docs, verbose=True, **kwargs):
+        '''
+        A method to count frequently appeared words from documents.
+        The user can figure out the representatives of stopwords with this method.
+
+        Attributes
+        ----------
+        docs : list
+            | A list of tokenized sentences.
+        verbose : bool
+            | Whether to show word counts if verbose is True. (default : True)
+        topn : int
+            | The number of words that would be printed.
+        '''
+
+        counter = Counter(itertools.chain(*docs))
+
+        if verbose:
+            topn = kwargs.get('topn', len(counter))
+            print('========================================')
+            print('Word counts')
+            for idx, (word, cnt) in enumerate(sorted(counter.items(), key=lambda x:x[1], reverse=True)[:topn]):
+                print('  | [{:>,}] {}: {}'.format((idx+1), word, cnt))
+
+        return counter
+
+    def check_removed_words(self, docs, stopword_removed_docs, **kwargs):
+        '''
+        A method to check the stopwords were successfully removed.
+
+        Attributes
+        ----------
+        docs : list
+            | A list of tokenized sentences (i.e., The original input documents).
+        stopword_removed_docs : list
+            | A list of stopword removed sentences.
+        topn : int
+            | The number of words that would be printed.
+        '''
+
+        word_counter_before = self.count_freq_words(docs, verbose=False)
+        word_counter_after = self.count_freq_words(stopword_removed_docs, verbose=False)
+
+        words_before = [w for w, c in sorted(word_counter_before.items(), key=lambda x:x[1], reverse=True)]
+        words_after = [w for w, c in sorted(word_counter_after.items(), key=lambda x:x[1], reverse=True)]
+
+        print('========================================')
+        print('Check stopwords removed')
+        topn = kwargs.get('topn', len(words_before))
+        for idx, word in enumerate(words_before[:topn]):
+            if word in words_after:
+                print('  | [{:>,}] BEFORE: {} -> AFTER: {}({:,})'.format((idx+1), word, word, word_counter_after[word]))
+            else:
+                print('  | [{:>,}] BEFORE: {}({:,}) -> '.format((idx+1), word, word_counter_before[word]))
+
+    def load_stoplist(self):
+        '''
+        A method to load user-customized stopword list.
+        '''
+
+        if os.path.isfile(self.fpath_stoplist):
+            with open(self.fpath_stoplist, 'r', encoding='utf-8') as f:
+                self.stoplist = list(set([w.strip() for w in f.read().strip().split('\n')]))
         else:
-            return self.noun_extractor.train_extract(text)
+            pass
+
+    def write_stoplist(self, verbose=False):
+        '''
+        A method to write sorted and set stopword list.
+
+        Attributes
+        ----------
+        verbose : bool
+            | Whether to show the overwriting status of stoplist. (default : False)
+        '''
+
+        if not self.stoplist:
+            print('WARNING: No stoplist exists. The current fpath will be overwritten.')
+        else:
+            if os.path.isfile(self.fpath_stoplist) and verbose:
+                print('INFO: The current fpath will be overwritten with sorted version.')
+            with open(self.fpath_stoplist, 'w', encoding='utf-8') as f:
+                f.write('\n'.join(self.stoplist))
+
+    def remove(self, sent):
+        '''
+        A method to remove stopwords from a tokenized sent.
+
+        Attributes
+        ----------
+        sent : list
+            | A tokenized sentence.
+        '''
+
+        self.load_stoplist()
+        self.write_stoplist()
+        stopword_removed_sent = [w.strip() for w in sent if w not in self.stoplist]
+        return stopword_removed_sent
