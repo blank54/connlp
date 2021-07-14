@@ -62,17 +62,33 @@ tokenizer.tokenize(text='I am a boy!')
 ```
 
 ## _KoreanTokenizer_
-### TODO ###
 
-_**KoreanTokenizer**_ tokenizes the input text in Korean, and is based on _**soynlp**_ (https://github.com/lovit/soynlp), an unsupervised text analyzer in Korean.
+_**KoreanTokenizer**_ tokenizes the input text in Korean, and is based on either pre-trained or unsupervised approaches.
 
-### _train_
-
-A _**KoreanTokenizer**_ object first needs to be trained on (unlabeled) corpus. 'Word score' is calculated for every subword in the corpus.
+You are recommended to use pre-trained method unless you have a large size of corpus. This is the default setting.
+If you want to use a pre-trained tokenizer, you have to select which analyzer you want to use. Available analyzers are based on KoNLPy (https://konlpy.org/ko/latest/api/konlpy.tag/), a python package for Korean language processing. The default analyzer is _**Hannanum**_
 
 ```python
 from connlp.preprocess import KoreanTokenizer
-tokenizer = KoreanTokenizer(min_frequency=0) # see 'soynlp' for detailed explanation on keyword arguments
+tokenizer = KoreanTokenizer(pre_trained=True, analyzer='Hannanum')
+```
+
+If your corpus is big, you may use an unsupervised method, which is based on _**soynlp**_ (https://github.com/lovit/soynlp), an unsupervised text analyzer in Korean.
+
+```python
+from connlp.preprocess import KoreanTokenizer
+tokenizer = KoreanTokenizer(pre_trained=False)
+```
+
+### _train_
+
+If your _**KoreanTokenizer**_ are pre-trained, you can neglect this step.
+
+Otherwhise (i.e. you are using an unsupervised approach), the _**KoreanTokenizer**_ object first needs to be trained on (unlabeled) corpus. 'Word score' is calculated for every subword in the corpus.
+
+```python
+from connlp.preprocess import KoreanTokenizer
+tokenizer = KoreanTokenizer(pre_trained=False) # see 'soynlp' for detailed explanation on keyword arguments
 
 docs = ['코퍼스의 첫 번째 문서입니다.', '두 번째 문서입니다.', '마지막 문서']
 
@@ -84,10 +100,23 @@ print(tokenizer.word_score)
 
 ### _tokenize_
 
-Tokenization is based on the 'word score' calculated from _**KoreanTokenizer.train**_ method.  
+If you are using a pre-trained _**KoreanTokenizer**_, the selected KoNLPy analyzer will tokenize the input sentence based on morphological analysis.
+
+```python
+from connlp.preprocess import KoreanTokenizer
+tokenizer = KoreanTokenizer(pre_trained=True, analyzer='Hannanum')
+doc = docs[0] # '코퍼스의 첫 번째 문서입니다.'
+tokenizer.tokenize(doc)
+
+# ['코퍼스', '의', '첫', '번째', '문서', '입니다', '.']
+```
+
+If you are using an unsupervised _**KoreanTokenizer**_, tokenization is based on the 'word score' calculated from _**KoreanTokenizer.train**_ method.  
 For each blank-separated token, a subword that has the maximum 'word score' is selectd as an individual 'word' and separated with the remaining part.
 
 ```python
+from connlp.preprocess import KoreanTokenizer
+tokenizer = KoreanTokenizer(pre_trained=False)
 doc = docs[0] # '코퍼스의 첫 번째 문서입니다.'
 tokenizer.tokenize(doc)
 
