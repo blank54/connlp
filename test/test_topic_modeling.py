@@ -8,7 +8,7 @@ import sys
 file_path = os.path.dirname(os.path.abspath(__file__))
 config_path = os.path.sep.join(file_path.split(os.path.sep)[:-1])
 sys.path.append(config_path)
-from connlp.analysis import TopicModel
+from connlp.analysis_lda import TopicModel
 
 
 ## LDA Topic Modeling

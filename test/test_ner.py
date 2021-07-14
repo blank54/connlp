@@ -14,7 +14,7 @@ sys.path.append(config_path)
 from connlp.util import makedir
 from connlp.preprocess import EnglishTokenizer
 from connlp.embedding import Vectorizer
-from connlp.analysis import NER_LabeledSentence, NER_Labels, NER_Corpus, NER_Model
+from connlp.analysis_ner import NER_LabeledSentence, NER_Labels, NER_Corpus, NER_Model
 tokenizer = EnglishTokenizer()
 vectorizer = Vectorizer()
 
