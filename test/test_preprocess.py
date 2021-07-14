@@ -11,7 +11,8 @@ sys.path.append(config_path)
 from connlp.preprocess import EnglishTokenizer, Normalizer, KoreanTokenizer
 eng_tokenizer = EnglishTokenizer()
 normalizer = Normalizer()
-kor_tokenizer = KoreanTokenizer(min_frequency=0)
+pretrained_kor_tokenizer = KoreanTokenizer()
+unsupervised_kor_tokenizer = KoreanTokenizer(pre_trained=False)
 
 ## Preprocess
 # Normalizer
@@ -31,7 +32,7 @@ def test_english_tokenizer():
         print(tokenized_doc)
 
 # Korean Tokenizer
-def test_korean_tokenizer(kor_docs):
+def test_korean_tokenizer(kor_docs, kor_tokenizer):
     print('\nTRAINING Korean Tokenizer...')
     kor_tokenizer.train(kor_docs)
 
@@ -39,7 +40,9 @@ def test_korean_tokenizer(kor_docs):
 
     for doc in kor_docs:
         tokenized_doc = kor_tokenizer.tokenize(doc)
-        print(tokenized_doc)
+        nouns = kor_tokenizer.extract_noun(doc)
+        print('Tokens:', tokenized_doc)
+        print('\tNouns:', nouns)
 
 ## Run
 if __name__ == '__main__':
@@ -50,6 +53,10 @@ if __name__ == '__main__':
 
     kor_docs = ['코퍼스의 첫 번째 문서입니다.', '두 번째 문서입니다.', '마지막 문서']
 
-    print('\nKorean Tokenizer Test')
-    print(kor_docs)
-    test_korean_tokenizer(kor_docs)
+    print('\ncorpus:', kor_docs)
+
+    print('Testing a pre-trained KoreanTokenizer...')
+    test_korean_tokenizer(kor_docs, pretrained_kor_tokenizer)
+
+    print('Testing an unsupervised KoreanTokenizer...')
+    test_korean_tokenizer(kor_docs, unsupervised_kor_tokenizer)
