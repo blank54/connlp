@@ -62,6 +62,7 @@ tokenizer.tokenize(text='I am a boy!')
 ```
 
 ## _KoreanTokenizer_
+### TODO ###
 
 _**KoreanTokenizer**_ tokenizes the input text in Korean, and is based on _**soynlp**_ (https://github.com/lovit/soynlp), an unsupervised text analyzer in Korean.
 
