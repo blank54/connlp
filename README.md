@@ -89,7 +89,7 @@ Otherwhise (i.e. you are using an unsupervised approach), the _**KoreanTokenizer
 
 ```python
 from connlp.preprocess import KoreanTokenizer
-tokenizer = KoreanTokenizer(pre_trained=False) # see 'soynlp' for detailed explanation on keyword arguments
+tokenizer = KoreanTokenizer(pre_trained=False)
 
 docs = ['코퍼스의 첫 번째 문서입니다.', '두 번째 문서입니다.', '마지막 문서']
 
