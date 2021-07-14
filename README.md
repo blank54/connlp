@@ -83,7 +83,7 @@ print(tokenizer.word_score)
 
 ### _tokenize_
 
-Tokenization is based on the 'word score' calculated from _**KoreanTokenizer.train**_ method. 
+Tokenization is based on the 'word score' calculated from _**KoreanTokenizer.train**_ method.  
 For each blank-separated token, a subword that has the maximum 'word score' is selectd as an individual 'word' and separated with the remaining part.
 
 ```python
@@ -91,6 +91,99 @@ doc = docs[0] # '코퍼스의 첫 번째 문서입니다.'
 tokenizer.tokenize(doc)
 
 # ['코퍼스의', '첫', '번째', '문서', '입니다.']
+```
+
+## _StopwordRemover_
+
+_**StopwordRemover**_ removes stopwords from a given sentence based on the user-customized stopword list.  
+Before utilizing _**StopwordRemover**_ the user should normalize and tokenize the docs.
+
+```python
+from connlp.preprocess import Normalizer, EnglishTokenizer, StopwordRemover
+normalizer = Normalizer()
+eng_tokenizer = EnglishTokenizer()
+stopword_remover = StopwordRemover()
+
+docs = ['I am a boy!', 'He is a boy..', 'She is a girl?']
+tokenized_docs = []
+
+for doc in eng_docs:
+    normalized_doc = normalizer.normalize(text=doc)
+    tokenized_doc = eng_tokenizer.tokenize(text=normalized_doc)
+    tokenized_docs.append(tokenized_doc)
+
+print(docs)
+print(tokenized_docs)
+
+# ['I am a boy!', 'He is a boy..', 'She is a girl?']
+# [['i', 'am', 'a', 'boy'], ['he', 'is', 'a', 'boy'], ['she', 'is', 'a', 'girl']]
+```
+
+The user should prepare a customized stopword list (i.e., _stoplist_).  
+The _stoplist_ should include user-customized stopwords divided by '\n' and the file should be in ".txt" format.
+
+```text
+a
+is
+am
+```
+
+Initiate the _**StopwordRemover**_ with appropriate filepath of user-customized stopword list.  
+If the stoplist is absent at the filepath, the stoplist would be ramain as a blank list.
+
+```python
+fpath_stoplist = 'test/thesaurus/stoplist.txt'
+stopword_remover.initiate(fpath_stoplist=fpath_stoplist)
+
+print(stopword_remover)
+
+# <connlp.preprocess.StopwordRemover object at 0x7f163e70c050>
+```
+
+The user can count the word frequencies and figure out additional stopwords based on the results.
+
+```python
+stopword_remover.count_freq_words(docs=tokenized_docs)
+
+# ========================================
+# Word counts
+#   | [1] a: 3
+#   | [2] boy: 2
+#   | [3] is: 2
+#   | [4] i: 1
+#   | [5] am: 1
+#   | [6] he: 1
+#   | [7] she: 1
+#   | [8] girl: 1
+```
+
+After finally updating the _stoplist_, use _**remove**_ method to remove the stopwords from text.
+
+```python
+stopword_removed_docs = []
+    for doc in tokenized_docs:
+        stopword_removed_docs.append(stopword_remover.remove(sent=doc))
+
+print(stopword_removed_docs)
+
+# [['i', 'boy'], ['he', 'boy'], ['she', 'girl']]
+```
+
+The user can check which stopword was removed with _**check_removed_words**_ methods.
+
+```python
+stopword_remover.check_removed_words(docs=tokenized_docs, stopword_removed_docs=stopword_removed_docs)
+
+# ========================================
+# Check stopwords removed
+#   | [1] BEFORE: a(3) ->
+#   | [2] BEFORE: boy -> AFTER: boy(2)
+#   | [3] BEFORE: is(2) ->
+#   | [4] BEFORE: i -> AFTER: i(1)
+#   | [5] BEFORE: am(1) ->
+#   | [6] BEFORE: he -> AFTER: he(1)
+#   | [7] BEFORE: she -> AFTER: she(1)
+#   | [8] BEFORE: girl -> AFTER: girl(1)
 ```
 
 # Embedding
