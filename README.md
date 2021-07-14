@@ -66,6 +66,7 @@ tokenizer.tokenize(text='I am a boy!')
 _**KoreanTokenizer**_ tokenizes the input text in Korean, and is based on either pre-trained or unsupervised approaches.
 
 You are recommended to use pre-trained method unless you have a large size of corpus. This is the default setting.
+
 If you want to use a pre-trained tokenizer, you have to select which analyzer you want to use. Available analyzers are based on KoNLPy (https://konlpy.org/ko/latest/api/konlpy.tag/), a python package for Korean language processing. The default analyzer is _**Hannanum**_
 
 ```python
@@ -111,7 +112,8 @@ tokenizer.tokenize(doc)
 # ['코퍼스', '의', '첫', '번째', '문서', '입니다', '.']
 ```
 
-If you are using an unsupervised _**KoreanTokenizer**_, tokenization is based on the 'word score' calculated from _**KoreanTokenizer.train**_ method.  
+If you are using an unsupervised _**KoreanTokenizer**_, tokenization is based on the 'word score' calculated from _**KoreanTokenizer.train**_ method.
+
 For each blank-separated token, a subword that has the maximum 'word score' is selectd as an individual 'word' and separated with the remaining part.
 
 ```python
