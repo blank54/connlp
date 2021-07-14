@@ -319,12 +319,18 @@ d2v_model.infer_vector(doc_words=test_doc)
 _**TopicModel**_ is a class for topic modeling based on gensim LDA model.  
 It provides a simple way to train lda model and assign topics to docs.  
 
+Before using LDA topic modeling, the user should install the following packages.
+
+```shell
+pip install pyldavis==2.1.2
+```
+
 _**TopicModel**_ requires two instances.  
 - a dict of docs whose keys are the tag
 - the number of topics for modeling
 
 ```python
-from connlp.analysis import TopicModel
+from connlp.analysis_lda import TopicModel
 
 num_topics = 2
 docs = {'doc1': ['I', 'am', 'a', 'boy'],
@@ -408,7 +414,7 @@ At the beginning, appropriate labels are required.
 The labels should be numbered with start of 0.
 
 ```python
-from connlp.analysis import NER_Labels
+from connlp.analysis_ner import NER_Labels
 
 label_dict = {'NON': 0,     #None
               'PER': 1,     #PERSON
@@ -426,7 +432,7 @@ Once the corpus was developed, every data of sentences and labels would be padde
 
 ```python
 from connlp.preprocess import EnglishTokenizer
-from connlp.analysis import NER_LabeledSentence, NER_Corpus
+from connlp.analysis_ner import NER_LabeledSentence, NER_Corpus
 tokenizer = EnglishTokenizer()
 
 data_sents = {'sent1': 'Sam likes pizza',
@@ -454,7 +460,7 @@ max_sent_len = 10
 ner_corpus = NER_Corpus(docs=docs, ner_labels=ner_labels, max_sent_len=max_sent_len)
 type(ner_corpus)
 
-# <class 'connlp.analysis.NER_Corpus'>
+# <class 'connlp.analysis_ner.NER_Corpus'>
 ```
 
 ### _Word Embedding_
@@ -489,7 +495,7 @@ The parameters for Bi-LSTM and model training should be provided, however, they 
 The user should initialize the _**NER_Model**_ with _**NER_Corpus**_ and the parameters.
 
 ```python
-from connlp.analysis import NER_Model
+from connlp.analysis_ner import NER_Model
 
 parameters = {
     # Parameters for Bi-LSTM.
@@ -510,7 +516,7 @@ ner_model = NER_Model()
 ner_model.initialize(ner_corpus=ner_corpus, parameters=parameters)
 type(ner_model)
 
-# <class 'connlp.analysis.NER_Model'>
+# <class 'connlp.analysis_ner.NER_Model'>
 ```
 
 ### _Model Training_
