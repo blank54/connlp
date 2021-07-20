@@ -14,8 +14,18 @@ Mainly reconstitute the pre-exist python libraries for Natural Language Processi
 
 ## _Setup_
 
+Install _**connlp**_ with _pip_.
+
 ```shell
 pip install connlp
+```
+
+Install _requirements.txt_.
+
+```shell
+cd WORKSPACE
+wget -O requirements_connlp.txt https://github.com/blank54/connlp/blob/master/requirements.txt
+pip install -r requirements_connlp.txt
 ```
 
 ## _Test_
