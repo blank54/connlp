@@ -24,7 +24,7 @@ Install _requirements.txt_.
 
 ```shell
 cd WORKSPACE
-wget -O requirements_connlp.txt https://github.com/blank54/connlp/blob/master/requirements.txt
+wget -O requirements_connlp.txt https://raw.githubusercontent.com/blank54/connlp/master/requirements.txt
 pip install -r requirements_connlp.txt
 ```
 
