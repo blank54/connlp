@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='connlp',
-    version='0.0.15',
+    version='0.0.16',
     license='',
     author='Seonghyeon Boris Moon',
     author_email='boris.moon514@gmail.com',

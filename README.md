@@ -635,6 +635,12 @@ print(ner_result)
 
 _**Visualizer**_ includes several simple tools for text visualization.
 
+Install the following packages.
+
+```
+pip install networkx wordcloud
+```
+
 ### _network_
 
 _**network**_ method provides a word network for tokenized docs.
@@ -647,7 +653,36 @@ visualizer = Visualizer()
 
 docs = ['I am a boy', 'She is a girl']
 tokenized_docs = [tokenizer.tokenize(text=doc) for doc in docs]
-visualizer.network(docs=tokenized_docs, show=True)
+word_network = visualizer.network(docs=tokenized_docs, show=True)
+```
+
+The word network is a _matplotlib.pyplot_ object.  
+The user can save the figure by _.savefig()_ method.
+
+```python
+word_network.savefig(FILEPATH)
+```
+
+### _wordcloud_
+
+_**wordcloud**_ method provides a word cloud for tokenized docs.
+
+```python
+from connlp.preprocess import EnglishTokenizer
+from connlp.visualize import Visualizer
+tokenizer = EnglishTokenizer()
+visualizer = Visualizer()
+
+docs = ['I am a boy', 'She is a girl']
+tokenized_docs = [tokenizer.tokenize(text=doc) for doc in docs]
+wordcloud = visualizer.wordcloud(docs=tokenized_docs, show=True)
+```
+
+The wordcloud is a _matplotlib.pyplot_ object.  
+The user can save the figure by _.savefig()_ method.
+
+```python
+wordcloud.savefig(FILEPATH)
 ```
 
 # Extracting Text
@@ -689,7 +724,7 @@ Refer to "https://github.com/anderskm/gputil" and "https://data-newbie.tistory.c
 Install _GPUtils_ module with _pip_.
 
 ```
-pip install GPUtils
+pip install GPUtil
 ```
 
 Write your code between the initiation of the _**GPUMonitor**_ and _**monitor.stop()**_.
