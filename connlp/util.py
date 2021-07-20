@@ -75,7 +75,7 @@ def accuracy(tp, tn, fp, fn):
     return (tp+tn)/(tp+tn+fp+fn)
 
 
-class GPUMonitor(Thread):
+class GPUMonitor(Thread):    
     '''
     A class to monitor the GPU status.
     Refer to "https://github.com/anderskm/gputil" and "https://data-newbie.tistory.com/561" for usages.

@@ -4,10 +4,10 @@
 # Configuration
 import itertools
 from collections import defaultdict
-
-import networkx as nx
 import matplotlib.pyplot as plt
 
+import networkx as nx
+from wordcloud import WordCloud
 
 class CombCounter:
     '''
@@ -55,7 +55,7 @@ class Visualizer:
 
     def network(self, docs, show=False, fig_width=10, fig_height=8, dpi=300, arrows=False, node_size=10, font_size=8, width=0.6, edge_color='grey', node_color='purple', with_labels=False, facecolor='white', alpha=0, edgecolor='white'):
         '''
-        A method to return word network
+        A method to return word network.
 
         Copyright (C) 2004-2021, NetworkX Developers
         Aric Hagberg <hagberg@lanl.gov>
@@ -102,3 +102,42 @@ class Visualizer:
 
         if show:
             plt.show()
+
+        return plt
+
+    def wordcloud(self, docs, show=False, width=1200, height=900, background_color='white', **kwargs):
+        '''
+        A method to draw a word cloud for the given docs.
+
+        Copyright (c) 2012 Andreas Christian Mueller
+
+        Attributes
+        ----------
+        docs : list
+            | A list of tokenized words.
+        show : bool
+            | Whether show the figure or not (default : False).
+        font_path : str
+            | A filepath of font.
+            | The user should specify font path for the Korean.
+        stoplist : list
+            | Stopwords list.
+
+        NOTE: other attributes follow the original documentation of WordCloud.
+        '''
+
+        font_path = kwargs.get('font_path', None)
+        stoplist = kwargs.get('stoplist', [])
+
+        data = ' '.join(itertools.chain(*docs))
+        wc = WordCloud(width=width, height=height, background_color=background_color, 
+                       font_path=font_path,
+                       stopwords=stoplist)
+        wc.generate(data)
+        plt.imshow(wc, interpolation='bilinear')
+        plt.axis('off')
+
+        if show:
+            plt.show()
+
+        return plt
