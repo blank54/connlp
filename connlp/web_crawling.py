@@ -159,3 +159,64 @@ class NewsDate:
             return datetime.strptime(self.date, '%Y%m%d').strftime('%Y.%m.%d')
         except:
             return ''
+
+
+class NewsCrawler(time_lag):
+    time_lag_random = np.random.normal(loc=time_lag, scale=0.1)
+    headers = {'User-Agent': '''
+        [Windows64,Win64][Chrome,58.0.3029.110][KOS] 
+        Mozilla/5.0 Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) 
+        Chrome/58.0.3029.110 Safari/537.36
+        '''}
+
+
+class NaverNewsListScraper(NewsCrawler):
+    def __init__(self):
+        self.url_base = 'https://search.naver.com/search.naver?where=news&sm=tab_pge&query={}&sort=1&photo=0&field=0&pd=3&ds={}&de={}&mynews=0&office_type=0&office_section_code=0&news_office_checked=&nso=so:dd,p:from{}to{},a:all&start={}'
+
+    def get_url_list(self, query, date):
+        query = NewsQuery(query)
+        date = NewsDate(date)
+
+        url_list = []
+        start_idx = 1
+        while True:
+            url_list_page = self.url_base.format(query(), date(), date(), date.date, date.date, start_idx)
+            req = request.Request(url=url_list_page, headers=self.headers)
+            html = request.urlopen(req).read()
+            soup = BeautifulSoup(html, 'lxml')
+            time.sleep(self.time_lag_random)
+
+            url_list.extend([s.get('href') for s in soup.find_all('a', class_='info') if '네이버뉴스' in s])
+            start_idx += 10
+
+            if soup.find('div', class_='not_found02'):
+                break
+            else:
+                continue
+
+        return list(set(url_list))
+
+
+class NaverNewsArticleParser(NewsCrawler):
+    def __init__(self):
+        pass
+
+    def parse(self, url):
+        req = request.Request(url=url, headers=self.headers)
+        html = request.urlopen(req).read()
+        soup = BeautifulSoup(html, 'lxml')
+        time.sleep(self.time_lag_random)
+
+        id = str(url.split('=')[-1])
+        title = soup.find_all('h3', {'id': 'articleTitle'})[0].get_text().strip()
+        date = soup.find_all('span', {'class': 't11'})[0].get_text().split()[0].replace('.', '').strip()
+        content = soup.find_all('div', {'id': 'articleBodyContents'})[0].get_text().strip()
+
+        try:
+            category = soup.find_all('em', {'class': 'guide_categorization_item'})[0].get_text().strip()
+        except IndexError:
+            category = None
+
+        article = NewsArticle(url=url, id=id, title=title, date=date, category=category, content=content)
+        return article
