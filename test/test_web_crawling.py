@@ -101,6 +101,18 @@ def parse_article(fdir_url_list, fdir_article):
         for url in errors:
             print(url)
 
+## Use article
+def print_article(fpath_article):
+    article = load_article(fpath_article=fpath_article)
+    print('============================================================')
+    print('Article information')
+    print('  | URL     : {}'.format(article.url))
+    print('  | Title   : {}'.format(article.title))
+    print('  | Date    : {}'.format(article.date))
+    print('  | Query   : {}'.format(', '.join(article.query)))
+    print('  | Category: {}'.format(article.category))
+    print('  | Content : {}...'.format(article.content[:20]))
+
 
 if __name__ == '__main__':
     ## Web crawling information
@@ -117,3 +129,7 @@ if __name__ == '__main__':
 
     ## Parse article
     parse_article(fdir_url_list=fdir_url_list, fdir_article=fdir_article)
+
+    ## Use article
+    fpath_article = os.path.join(fdir_article, os.listdir(fdir_article)[0])
+    print_article(fpath_article=fpath_article)
