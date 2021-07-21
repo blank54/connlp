@@ -80,3 +80,20 @@ class Status:
         print('  | fdir: {}'.format(fdir_articles))
         print('  | Total: {:,}'.format(len(flist)))
 
+class Article:
+    def __init__(self, **kwargs):
+        self.url = kwargs.get('url', '')
+        self.id = kwargs.get('id', '')
+        self.query = []
+
+        self.title = kwargs.get('title', '')
+        self.date = kwargs.get('date', '')
+        self.category = kwargs.get('category', '')
+        self.content = kwargs.get('content', '')
+
+        self.content_normalized = kwargs.get('content_normalized', '')
+
+    def extend_query(self, query_list):
+        queries = self.query
+        queries.extend(query_list)
+        self.query = list(set(queries))
