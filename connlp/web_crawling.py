@@ -151,16 +151,36 @@ class NewsQueryParser:
         | Parse the query file and return the list of dates.
     parse
         | Parse the query file and return the list of queries and dates.
+    urlname2query
+        | Extract query from url name.
     '''
 
     def return_query_list(self, query_file):
-        _splitted_queries = [queries.split('\n') for queries in query_file[1:]]
+        '''
+        A method to parse the query file and return the list of queries.
+
+        Attributes
+        ----------
+        query_file : str
+            | The query file read by "with open".
+        '''
+
+        _splitted_queries = [queries.split('\n') for queries in query_file.split('\n\n')[1:]]
         _queries_combs = list(itertools.product(*_splitted_queries))
         query_list = ['+'.join(e) for e in _queries_combs]
         return query_list
 
     def return_date_list(self, query_file):
-        date_start, date_end = query_file[0].split('\n')
+        '''
+        A method to parse the query file and return the list of dates.
+
+        Attributes
+        ----------
+        query_file : str
+            | The query file read by "with open".
+        '''
+
+        date_start, date_end = query_file.split('\n\n')[0].split('\n')
 
         date_start_formatted = datetime.strptime(date_start, '%Y%m%d')
         date_end_formatted = datetime.strptime(date_end, '%Y%m%d')
@@ -173,14 +193,31 @@ class NewsQueryParser:
         return date_list
 
     def parse(self, fpath_query):
+        '''
+        A method to parse the query file and return the list of queries and dates.
+
+        Attributes
+        ----------
+        fpath_query : str
+            | The filepath of the query.
+        '''
+
         with open(fpath_query, 'r', encoding='utf-8') as f:
-            query_file = f.read().split('\n\n')
+            query_file = f.read()
 
         query_list = self.return_query_list(query_file=query_file)
         date_list = self.return_date_list(query_file=query_file)
         return query_list, date_list
 
     def urlname2query(self, fname_url_list):
+        '''
+        A method to extract query from given url name.
+
+        Attributes
+        fname_url_list : str
+            | The file name of the url list.
+        '''
+
         Q, D = fname_url_list.replace('.pk', '').split('_')
         query_list = Q.split('-')[1].split('+')
         date = D.split('-')[1]
@@ -320,6 +357,8 @@ class NaverNewsArticleParser(NewsCrawler):
     -------
     parse
         | Parse the page of the given url and return the article information.
+    url2id
+        | Extract article id from the url.
     '''
 
     def __init__(self):
@@ -353,5 +392,14 @@ class NaverNewsArticleParser(NewsCrawler):
         return article
 
     def url2id(self, url):
+        '''
+        A method to extract article id from the url.
+
+        Attributes
+        ----------
+        url : str
+            | The article url.
+        '''
+
         id = str(url.split('=')[-1])
         return id
