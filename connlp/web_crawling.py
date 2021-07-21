@@ -14,7 +14,7 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup
 
 
-class Status:
+class NewsStatus:
     '''
     A class to print status of web crawling.
 
@@ -81,7 +81,7 @@ class Status:
         print('  | Total: {:,}'.format(len(flist)))
 
 
-class Article:
+class NewsArticle:
     def __init__(self, **kwargs):
         self.url = kwargs.get('url', '')
         self.id = kwargs.get('id', '')
@@ -100,7 +100,7 @@ class Article:
         self.query = list(set(queries))
 
 
-class QueryParser:
+class NewsQueryParser:
     def parse(self, fpath_query):
         with open(fpath_query, 'r', encoding='utf-8') as f:
             query_file = f.read().split('\n\n')
@@ -129,7 +129,7 @@ class QueryParser:
         return date_list
 
 
-class Query:
+class NewsQuery:
     def __init__(self, query):
         self.query = query
 
@@ -141,3 +141,21 @@ class Query:
 
     def __len__(self):
         return len(self.query.split('+'))
+
+
+class NewsDate:
+    def __init__(self, date):
+        self.date = date
+        self.formatted = self.__convert_date()
+
+    def __call__(self):
+        return self.formatted
+
+    def __str__(self):
+        return '{}'.format(self.__call__())
+
+    def __convert_date(self):
+        try:
+            return datetime.strptime(self.date, '%Y%m%d').strftime('%Y.%m.%d')
+        except:
+            return ''
