@@ -154,7 +154,7 @@ class NewsQueryParser:
     '''
 
     def return_query_list(self, query_file):
-        _splitted_queries = [queries.split('\n') for queries in query_file]
+        _splitted_queries = [queries.split('\n') for queries in query_file[1:]]
         _queries_combs = list(itertools.product(*_splitted_queries))
         query_list = ['+'.join(e) for e in _queries_combs]
         return query_list
@@ -179,6 +179,12 @@ class NewsQueryParser:
         query_list = self.return_query_list(query_file=query_file)
         date_list = self.return_date_list(query_file=query_file)
         return query_list, date_list
+
+    def urlname2query(self, fname_url_list):
+        Q, D = fname_url_list.replace('.pk', '').split('_')
+        query_list = Q.split('-')[1].split('+')
+        date = D.split('-')[1]
+        return query_list, date
 
 
 class NewsQuery:
@@ -233,7 +239,7 @@ class NewsDate:
             return ''
 
 
-class NewsCrawler(time_lag):
+class NewsCrawler():
     '''
     A class of news crawler that includes headers.
 
@@ -245,7 +251,7 @@ class NewsCrawler(time_lag):
         | Crawling header that is used generally.
     '''
 
-    time_lag_random = np.random.normal(loc=time_lag, scale=0.1)
+    time_lag_random = np.random.normal(loc=1.0, scale=0.1)
     headers = {'User-Agent': '''
         [Windows64,Win64][Chrome,58.0.3029.110][KOS] 
         Mozilla/5.0 Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) 
@@ -334,7 +340,6 @@ class NaverNewsArticleParser(NewsCrawler):
         soup = BeautifulSoup(html, 'lxml')
         time.sleep(self.time_lag_random)
 
-        id = str(url.split('=')[-1])
         title = soup.find_all('h3', {'id': 'articleTitle'})[0].get_text().strip()
         date = soup.find_all('span', {'class': 't11'})[0].get_text().split()[0].replace('.', '').strip()
         content = soup.find_all('div', {'id': 'articleBodyContents'})[0].get_text().strip()
@@ -344,5 +349,9 @@ class NaverNewsArticleParser(NewsCrawler):
         except IndexError:
             category = None
 
-        article = NewsArticle(url=url, id=id, title=title, date=date, category=category, content=content)
+        article = NewsArticle(url=url, id=self.url2id(url), title=title, date=date, category=category, content=content)
         return article
+
+    def url2id(self, url):
+        id = str(url.split('=')[-1])
+        return id
