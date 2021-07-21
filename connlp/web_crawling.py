@@ -80,6 +80,7 @@ class Status:
         print('  | fdir: {}'.format(fdir_articles))
         print('  | Total: {:,}'.format(len(flist)))
 
+
 class Article:
     def __init__(self, **kwargs):
         self.url = kwargs.get('url', '')
@@ -97,3 +98,32 @@ class Article:
         queries = self.query
         queries.extend(query_list)
         self.query = list(set(queries))
+
+
+class QueryParser:
+    def parse(self, fpath_query):
+        with open(fpath_query, 'r', encoding='utf-8') as f:
+            query_file = f.read().split('\n\n')
+
+        query_list = self.build_query_list(query_file=query_file)
+        date_list = self.build_date_list(query_file=query_file)
+        return query_list, date_list
+
+    def build_query_list(self, query_file):
+        _splitted_queries = [queries.split('\n') for queries in query_file]
+        _queries_combs = list(itertools.product(*_splitted_queries))
+        query_list = ['+'.join(e) for e in _queries_combs]
+        return query_list
+
+    def build_date_list(self, query_file):
+        date_start, date_end = query_file[0].split('\n')
+
+        date_start_formatted = datetime.strptime(date_start, '%Y%m%d')
+        date_end_formatted = datetime.strptime(date_end, '%Y%m%d')
+        delta = date_end_formatted - date_start_formatted
+
+        date_list = []
+        for i in range(delta.days+1):
+            day = date_start_formatted + timedelta(days=i)
+            date_list.append(datetime.strftime(day, '%Y%m%d'))
+        return date_list
