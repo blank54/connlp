@@ -18,16 +18,18 @@ class NewsStatus:
     '''
     A class to print status of web crawling.
 
-    methods
+    Methods
     -------
-    query_history
+    queries
         | Print the history of queries.
         | The query files should start with "query_".
     urls
-        | Print the status of url list.
+        | Print the number of url list.
+    articles
+        | Print the number of article list.
     '''
 
-    def query_history(self, fdir_queries):
+    def queries(self, fdir_queries):
         history = defaultdict(list)
 
         for fname in sorted(os.listdir(fdir_queries)):
@@ -82,6 +84,34 @@ class NewsStatus:
 
 
 class NewsArticle:
+    '''
+    A class of news article.
+
+    Attributes
+    ----------
+    url : str
+        | The article url.
+    id : str
+        | The identification code for the article.
+    query : list
+        | A list of queries that were used to search the article.
+    title : str
+        | The title of the article.
+    date : str
+        | The uploaded date of the article. (format : yyyymmdd)
+    category : str
+        | The category that the article belongs to.
+    content : str
+        | The article content.
+    content_normalized : str
+        | Normalized content of the article.
+
+    Methods
+    -------
+    extend_query
+        | Extend the query list with the additional queries that were used to search the article.
+    '''
+
     def __init__(self, **kwargs):
         self.url = kwargs.get('url', '')
         self.id = kwargs.get('id', '')
@@ -95,27 +125,41 @@ class NewsArticle:
         self.content_normalized = kwargs.get('content_normalized', '')
 
     def extend_query(self, query_list):
+        '''
+        A method to extend the query list.
+
+        Attributes
+        ----------
+        query_list : list
+            | A list of queries to be extended.
+        '''
+
         queries = self.query
         queries.extend(query_list)
         self.query = list(set(queries))
 
 
 class NewsQueryParser:
-    def parse(self, fpath_query):
-        with open(fpath_query, 'r', encoding='utf-8') as f:
-            query_file = f.read().split('\n\n')
+    '''
+    A class of news query parser.
 
-        query_list = self.build_query_list(query_file=query_file)
-        date_list = self.build_date_list(query_file=query_file)
-        return query_list, date_list
+    Method
+    ------
+    return_query_list
+        | Parse the query file and return the list of queries.
+    return_date_list
+        | Parse the query file and return the list of dates.
+    parse
+        | Parse the query file and return the list of queries and dates.
+    '''
 
-    def build_query_list(self, query_file):
+    def return_query_list(self, query_file):
         _splitted_queries = [queries.split('\n') for queries in query_file]
         _queries_combs = list(itertools.product(*_splitted_queries))
         query_list = ['+'.join(e) for e in _queries_combs]
         return query_list
 
-    def build_date_list(self, query_file):
+    def return_date_list(self, query_file):
         date_start, date_end = query_file[0].split('\n')
 
         date_start_formatted = datetime.strptime(date_start, '%Y%m%d')
@@ -128,8 +172,25 @@ class NewsQueryParser:
             date_list.append(datetime.strftime(day, '%Y%m%d'))
         return date_list
 
+    def parse(self, fpath_query):
+        with open(fpath_query, 'r', encoding='utf-8') as f:
+            query_file = f.read().split('\n\n')
+
+        query_list = self.return_query_list(query_file=query_file)
+        date_list = self.return_date_list(query_file=query_file)
+        return query_list, date_list
+
 
 class NewsQuery:
+    '''
+    A class of news query to address the encoding issues.
+
+    Attributes
+    ----------
+    query : str
+        | Query in string format.
+    '''
+
     def __init__(self, query):
         self.query = query
 
@@ -144,6 +205,17 @@ class NewsQuery:
 
 
 class NewsDate:
+    '''
+    A class of news dates to address the encoding issues.
+
+    Attributes
+    ----------
+    date : str
+        | Date in string format. (format : yyyymmdd)
+    formatted : datetime
+        | Formatted date.
+    '''
+
     def __init__(self, date):
         self.date = date
         self.formatted = self.__convert_date()
@@ -162,6 +234,17 @@ class NewsDate:
 
 
 class NewsCrawler(time_lag):
+    '''
+    A class of news crawler that includes headers.
+
+    Attributes
+    ----------
+    time_lag_random : float
+        | A random number for time lag.
+    headers : dict
+        | Crawling header that is used generally.
+    '''
+
     time_lag_random = np.random.normal(loc=time_lag, scale=0.1)
     headers = {'User-Agent': '''
         [Windows64,Win64][Chrome,58.0.3029.110][KOS] 
@@ -171,10 +254,35 @@ class NewsCrawler(time_lag):
 
 
 class NaverNewsListScraper(NewsCrawler):
+    '''
+    A scraper for the article list of naver news.
+
+    Attributes
+    ----------
+    url_base : str
+        | The url base of the article list page of naver news.
+
+    Methods
+    -------
+    get_url_list
+        | Get the url list of articles for the given query and dates.
+    '''
+
     def __init__(self):
         self.url_base = 'https://search.naver.com/search.naver?where=news&sm=tab_pge&query={}&sort=1&photo=0&field=0&pd=3&ds={}&de={}&mynews=0&office_type=0&office_section_code=0&news_office_checked=&nso=so:dd,p:from{}to{},a:all&start={}'
 
     def get_url_list(self, query, date):
+        '''
+        A method to get url list of articles for the given query and dates.
+
+        Attributes
+        ----------
+        query : str
+            | A query of simple string format.
+        date : str
+            | A date to search the query. (foramt : yyyymmdd)
+        '''
+
         query = NewsQuery(query)
         date = NewsDate(date)
 
@@ -199,10 +307,28 @@ class NaverNewsListScraper(NewsCrawler):
 
 
 class NaverNewsArticleParser(NewsCrawler):
+    '''
+    A parser of naver news article page.
+
+    Methods
+    -------
+    parse
+        | Parse the page of the given url and return the article information.
+    '''
+
     def __init__(self):
         pass
 
     def parse(self, url):
+        '''
+        A method to parse the article page.
+
+        Attributes
+        ----------
+        url : str
+            | The url of the article page.
+        '''
+
         req = request.Request(url=url, headers=self.headers)
         html = request.urlopen(req).read()
         soup = BeautifulSoup(html, 'lxml')
