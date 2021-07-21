@@ -9,10 +9,11 @@ config_path = os.path.sep.join(file_path.split(os.path.sep)[:-1])
 sys.path.append(config_path)
 
 from connlp.util import makedir
-from connlp.web_crawling import NewsQueryParser, NaverNewsListScraper, NaverNewsArticleParser
+from connlp.web_crawling import NewsQueryParser, NaverNewsListScraper, NaverNewsArticleParser, NewsStatus
 query_parser = NewsQueryParser()
 list_scraper = NaverNewsListScraper()
 article_parser = NaverNewsArticleParser()
+news_status = NewsStatus()
 
 import itertools
 import pickle as pk
@@ -116,11 +117,13 @@ def print_article(fpath_article):
 
 if __name__ == '__main__':
     ## Web crawling information
-    fname_query = 'query_20210721.txt'
-    fpath_query = os.path.join('test/web_crawling/naver/query/', fname_query)
+    fdir_queries = 'test/web_crawling/naver/query/'
     fdir_url_list = 'test/web_crawling/naver/url_list/'
     fdir_article = 'test/web_crawling/naver/article/'
-    
+
+    fname_query = 'query_20210721.txt'
+    fpath_query = os.path.join(fdir_queries, fname_query)
+        
     ## Parse query
     query_list, date_list = parse_query(fpath_query=fpath_query)
 
@@ -129,6 +132,11 @@ if __name__ == '__main__':
 
     ## Parse article
     parse_article(fdir_url_list=fdir_url_list, fdir_article=fdir_article)
+
+    ## Data collection status
+    news_status.queries(fdir_queries=fdir_queries)
+    news_status.urls(fdir_urls=fdir_url_list)
+    news_status.articles(fdir_articles=fdir_article)
 
     ## Use article
     fpath_article = os.path.join(fdir_article, os.listdir(fdir_article)[0])

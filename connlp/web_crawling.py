@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 # Configuration
+import os
 import time
 import itertools
 import numpy as np
 import pickle as pk
+import pandas as pd
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -37,10 +39,8 @@ class NewsStatus:
                 continue
 
             collected_date = fname.replace('.txt', '').split('_')[1]
-            fpath = os.path.join(fdir_queries, fname)
-            with open(fpath, 'r', encoding='utf-8') as f:
-                query_file = f.read().split('\n\n')
-                date_list, query_list = parse_query(query_file)
+            fpath_query = os.path.join(fdir_queries, fname)
+            query_list, date_list = NewsQueryParser().parse(fpath_query)
 
             history['collected_date'].append(collected_date)
             history['date_start'].append(date_list[0])
