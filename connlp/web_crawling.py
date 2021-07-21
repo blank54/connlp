@@ -127,3 +127,17 @@ class QueryParser:
             day = date_start_formatted + timedelta(days=i)
             date_list.append(datetime.strftime(day, '%Y%m%d'))
         return date_list
+
+
+class Query:
+    def __init__(self, query):
+        self.query = query
+
+    def __call__(self):
+        return quote(self.query.encode('utf-8'))
+
+    def __str__(self):
+        return '{}'.format(self.query)
+
+    def __len__(self):
+        return len(self.query.split('+'))
