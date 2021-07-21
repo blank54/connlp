@@ -79,3 +79,4 @@ class Status:
         print('Status: Articles')
         print('  | fdir: {}'.format(fdir_articles))
         print('  | Total: {:,}'.format(len(flist)))
+
