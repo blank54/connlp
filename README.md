@@ -639,6 +639,93 @@ print(ner_result)
 # Tom/PER eats/NON apple/FOD
 ```
 
+## _Web Crawling_
+
+The _**connlp**_ currently provides web crawling for Naver news articles.
+
+### _Query_
+
+The user should prepare the proper queries first.  
+A single text file(.txt) should include every information of the query as below.  
+- Date Start
+- Date End
+- Keywords
+
+The web crawler utilizes the keywords separated with '\n\n' in the same time.  
+Meanwhile, the web crawler utilizes the keywords separated with '\n' as a different queries.
+
+For example, if the queries are determined as below, the web crawler would search the articles with six queries: "smart+construction+safety at 20210718", "smart+construction+management at 20210718", "smart+construction+safety at 20210719", ...
+
+```plain
+20210718
+20210720
+
+smart
+
+construction
+
+safety
+management
+```
+
+The _**NewsQueryParser**_ parses the queries into appropriate formats.
+
+```python
+from connlp.web_crawling import NewsQueryParser
+query_parser = NewsQueryParser()
+
+fpath_query = 'FILEPATH_OF_YOUR_QUERY'
+query_list, date_list = query_parser.parse(fpath_query=fpath_query)
+```
+
+### _URLs_
+
+For the second step, the web crawler parses the web page that shows the list of news articles.  
+_**NaverNewsListScraper**_ provides the function of parsing the list page.  
+The user is recommended to save the url lists and load them later.
+
+```python
+from connlp.web_crawling import NaverNewsListScraper
+list_scraper = NaverNewsListScraper()
+
+for date in sorted(date_list, reverse=False):
+    for query in query_list:
+        url_list = list_scraper.get_url_list(query=query, date=date)
+```
+
+### _Articles_
+
+The last step is to parse the article page and get information from the article.  
+_**NaverNewsArticleParser**_ returns a class of _**Article**_ for a given article.  
+Remember to extend the query list of the article.
+
+```python
+from connlp.web_crawling import NaverNewsArticleParser
+article_parser = NaverNewsArticleParser()
+
+query_list, _ = query_parser.urlname2query(fname_url_list=fname_url_list)
+for url in url_list:
+    article = article_parser.parse(url=url)
+    article.extend_query(query_list)
+```
+
+### _Status_
+
+_**NewsStatus**_ provides the status of the crawled corpus for given directories.
+
+```python
+from connlp.web_crawling import NewsStatus
+news_status = NewsStatus()
+
+fdir_queries = 'DIRECTORY_FOR_QUERIES'
+fdir_url_list = 'DIRECTORY_FOR_URLS'
+fdir_article = 'DIRECTORY_FOR_ARTICLES'
+
+news_status.queries(fdir_queries=fdir_queries)
+news_status.urls(fdir_urls=fdir_url_list)
+news_status.articles(fdir_articles=fdir_article)
+```
+
 # Visualization
 
 ## _Visualizer_
