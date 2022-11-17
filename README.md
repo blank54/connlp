@@ -7,7 +7,9 @@ Mainly reconstitute the pre-exist python libraries for Natural Language Processi
 
 ## _Contributors_
 - Seonghyeon Boris Moon (blank54@snu.ac.kr, https://github.com/blank54/)
+- Gitaek Lee (lgt0427@snu.ac.kr)
 - Sehwan Chung (hwani751@snu.ac.kr)
+- Taeyeon Chang (jgwoon1838@snu.ac.kr)
 - Jungyeon Kim (janykjy@snu.ac.kr)
 
 # Initialize
